@@ -1,0 +1,365 @@
+\documentclass[a4paper]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{soul}
+\usepackage [noae]{Sweave} 
+\usepackage{pdflscape}
+\usepackage{graphicx}
+\usepackage{type1cm}
+\usepackage{eso-pic}
+\usepackage{color}
+\usepackage{comment}
+\excludecomment{answer}
+
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%pre amble over%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<clear environment, echo=false>>=
+rm(list = ls())
+start.time<-proc.time()    
+options(width=100) 
+options(continue = " ")
+#sweave.file<-"1_TROUBLESHOOTING"
+author<-"Eamonn O'Brien"
+report.title<-"The Bayesian Bootstrap, Estimating Correlation"
+@
+<<set working directory, echo=false>>=
+@
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%DRAFT CHUNK END
+\author{\textbf{\Sexpr{author} }}
+\title{ \textbf{\Sexpr{report.title} \\ \Sexpr{format(Sys.time(), "%A, %d %B %Y")}}} 
+\date{} %inserting this removes date
+  
+%DRAFT CHUNK START http://filoxus.blogspot.com/2008/01/how-to-insert-watermark-in-latex.html
+
+
+\makeatletter
+\AddToShipoutPicture{%
+\setlength{\@tempdimb}{.5\paperwidth}%            
+\setlength{\@tempdimc}{.5\paperheight}%            
+\setlength{\unitlength}{1pt}%
+\put(\strip@pt\@tempdimb,\strip@pt\@tempdimc){%
+\makebox(0,0){\rotatebox{45}{\textcolor[gray]{0.75}%
+{\fontsize{10cm}{10cm}\selectfont{    } }}}}%   
+%{\fontsize{10cm}{10cm}\selectfont{DRAFT \Sexpr{format(Sys.time(), "%a %b %d %Y %X" )} }}}}%
+}%
+
+\makeatother
+\usepackage[numbers]{natbib}
+\usepackage{fancyhdr} %http://texblog.wordpress.com/2007/11/07/headerfooter-in-latex-with-fancyhdr/
+\usepackage{longtable}
+\pagestyle{fancy}
+\fancyhead{} %reset
+\fancyfoot{} %reset
+\begin{answer}
+\fancyhead[L]{EOB \\ Version a}   
+\fancyfoot[RO]{EOB}
+\end{answer}
+%\lhead{}
+%\chead{}
+%\lhead{\bfseries ADX11006.BR0015 Version a}
+\renewcommand{\headrulewidth}{0 pt} 
+% the above remove header line
+% this gives an error but works
+
+%http://ctan.sqsol.co.uk/macros/latex/contrib/fancyhdr/fancyhdr.pdf p15
+\usepackage{lastpage}
+\cfoot{Page \thepage\ of \pageref{LastPage}}
+
+\usepackage{setspace} %line spacing
+\setstretch{1} %line spacing
+
+@
+\begin{document}
+\setkeys{Gin}{width=.75\textwidth}
+\SweaveOpts{concordance=TRUE}
+ 
+\maketitle
+% http://www.stat.auckland.ac.nz/~ihaka/downloads/Sweave-customisation.pdf
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+% trimming the right side of data chunks to look better
+% reference http://www.stat.auckland.ac.nz/~ihaka/downloads/Sweave-customisation.pdf
+<<echo=false>>=
+options(width=100)
+@
+\section{Example showing Frequentist and Bayesian bootstrap correlation : Data comparing two methods of measuring blood flow }
+<<set working directory, echo=false, results=verbatim>>=
+#ref<-"http://rsnippets.blogspot.ie/2012/11/possible-error-bayesian-bootstrap.html"
+#cat(paste(strwrap(ref, width = 70), collapse = "\\\\\n"), "\n")
+<<eval=false, echo=FALSE>>=
+install.packages("devtools")
+library(devtools)
+install_github("Statisticat/LaplacesDemon")
+<<>>=
+set.seed(123)
+p3 <- function(x) {formatC(x, format="f", digits=3)}
+sims=19999
+library(LaplacesDemon)
+dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
+efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
+data.set <- data.frame(dye,efp)
+@
+\subsection{Frequentist bootstrap function}
+<<>>=
+sboot <- function() {
+  cor(data.set[sample(1:9, replace=T),])[1,2]
+}
+@
+\subsection{Bayesian bootstrap function}
+<<>>=
+bboot <- function() {
+  cov.wt(data.set, diff(c(0,sort(runif(8)),1)), cor=T)$cor[1,2]
+}
+@
+\subsection{Bayesian bootstrap using LaplaceDemon function}
+<<>>=
+X <- matrix(c(dye,efp), length(dye), 2)
+colnames(X) <- c("dye","efp")
+BB <- BayesianBootstrap(X=X, n=sims,
+                        Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
+@
+\subsection{Bayesian bootstrap using bayesboot function}
+<<>>=
+library(bayesboot)
+# Using the weighted correlation (corr) from the boot package.
+library(boot)
+b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
+<<label=altkm1, include=false , echo=false  >>=    
+ 
+## prepare x axis labels 
+x <- c(.3,.4,0.6,.8,.9, .96, .99, .999,.9999,.99995) #labels
+q <- qlogis(x)                                       #plot at these points
+
+f<-replicate(sims, sboot())
+b<-replicate(sims, bboot())
+BB <- unlist(BB)
+xx1 <- b4$V1
+
+ff <- qlogis(f)
+bb <- qlogis(b)
+BBB <- qlogis(BB)
+xx <- qlogis(xx1)
+
+# par(mfrow=c(3,1))
+# 
+# hist(ff,  xlim=c(-1,10) ,  main="Frequentist Bootstrap", xaxt='n', xlab = "Correlation")
+# axis(side=1, at=q, labels=x)
+# hist(bb, xlim=c(-1,10) ,  main="Bayesian Bootstrap", xaxt='n', xlab = "Correlation")
+# axis(side=1, at=q, labels=x)
+# hist(BBB,xlim=c(-1,10) ,  main= "LaplaceDemon Bayes Function", xaxt='n', xlab = "Correlation")
+# axis(side=1, at=q, labels=x)
+# 
+# par(mfrow=c(1,1))
+
+x <- c(.1,.2,.4,0.6,.8,.9, .97, .99, .999,.9999) #labels
+q <- qlogis(x)   
+
+require(ggplot2)
+x1 <- xlab("")
+est <- quantile(f, c(.025,.5,.975)) 
+ff <- as.data.frame(ff)
+
+pL1<- ggplot(data = ff, aes(x = ff)) + x1+   
+  geom_histogram(bins = 100, fill = rainbow(100))+
+   scale_x_continuous(limits = c(q[1], q[10]),
+                    breaks=q,  # this is where the values go
+                    labels= x)   +
+  labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+        theme_bw()  
+        pL1 <- pL1 + theme(axis.line=element_blank(),
+                        #axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks=element_blank(),
+                        #axis.title.x=element_blank(),
+                        axis.text=element_text(size=8),
+                        axis.title=element_text(size=6,face="bold"),
+                        #axis.title.y=element_blank(),
+                        # legend.position="none",
+                        panel.background=element_blank(),
+                        panel.border=element_blank(),
+                        #panel.grid.major=element_blank(),
+                        #panel.grid.minor=element_blank(),
+                        # plot.background=element_blank())
+                        #plot.margin = unit(c(1,1,1,1), "cm")
+                        plot.title = element_text(size = 8)
+                        )
+        
+est <- quantile(b, c(.025,.5,.975))  
+bb <- as.data.frame(bb)
+pL2<- ggplot(data = bb, aes(x = bb)) +x1 +
+  geom_histogram(bins = 100, fill = rainbow(100))+
+   scale_x_continuous(limits = c(q[1], q[10]),
+                    breaks=q,   
+                    labels= x) +
+  labs(title = paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+        theme_bw()  
+        pL2 <- pL2 + theme(axis.line=element_blank(),
+                        #axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks=element_blank(),
+                        #axis.title.x=element_blank(),
+                        axis.text=element_text(size=8),
+                        axis.title=element_text(size=6,face="bold"),
+                        #axis.title.y=element_blank(),
+                        # legend.position="none",
+                        panel.background=element_blank(),
+                        panel.border=element_blank(),
+                        #panel.grid.major=element_blank(),
+                        #panel.grid.minor=element_blank(),
+                        # plot.background=element_blank())
+                        #plot.margin = unit(c(1,1,1,1), "cm")
+                        plot.title = element_text(size = 8)
+                        )
+  
+est <- quantile(BB, c(.025,.5,.975))  
+BBB<- as.data.frame(BBB)
+pL3<- ggplot(data = BBB, aes(x = BBB)) +x1+ 
+   geom_histogram(bins = 100, fill = rainbow(100))+
+   scale_x_continuous(limits = c(q[1], q[10]),
+                    breaks=q,   
+                    labels= x)   +
+  labs(title = paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+        theme_bw()  
+        pL3 <- pL3 + theme(axis.line=element_blank(),
+                        #axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks=element_blank(),
+                        #axis.title.x=element_blank(),
+                        axis.text=element_text(size=8),
+                        axis.title=element_text(size=6,face="bold"),
+                        #axis.title.y=element_blank(),
+                        # legend.position="none",
+                        panel.background=element_blank(),
+                        panel.border=element_blank(),
+                        #panel.grid.major=element_blank(),
+                        #panel.grid.minor=element_blank(),
+                        # plot.background=element_blank())
+                        #plot.margin = unit(c(1,1,1,1), "cm")
+                        plot.title = element_text(size = 8)
+                        )
+
+ 
+        x1 <- xlab(" ")
+est <- quantile(xx1, c(.025,.5,.975))  
+xx<- as.data.frame(xx)
+pL4<- ggplot(data = xx, aes(x = xx)) +x1+ 
+   geom_histogram(bins = 100, fill = rainbow(100))+
+   scale_x_continuous(limits = c(q[1], q[10]),
+                    breaks=q,   
+                    labels= x)   +
+  labs(title = paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+        theme_bw()  
+        pL4 <- pL4 + theme(axis.line=element_blank(),
+                        #axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks=element_blank(),
+                        #axis.title.x=element_blank(),
+                        axis.text=element_text(size=8),
+                        axis.title=element_text(size=6,face="bold"),
+                        #axis.title.y=element_blank(),
+                        # legend.position="none",
+                        panel.background=element_blank(),
+                        panel.border=element_blank(),
+                        #panel.grid.major=element_blank(),
+                        #panel.grid.minor=element_blank(),
+                        # plot.background=element_blank())
+                        #plot.margin = unit(c(1,1,1,1), "cm")
+                        plot.title = element_text(size = 8)
+                        )
+        
+        
+        
+
+
+  gridExtra::grid.arrange(pL1,  pL2, pL3,  pL4, nrow=4) 
+
+
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setkeys{Gin}{width=1.1\textwidth}
+\begin{figure}[h]
+\section{Frequentist and Bayesian correlation estimates, plotted using a logistic transformation}
+\begin{center}
+<<label=altkm1,fig=True, echo=false, height=7,width=5>>=  
+par(mfrow = c(1, 1), pty = "s")
+<<altkm1>>
+@
+\end{center}
+\caption{ }
+\end{figure}
+\setkeys{Gin}{width=0.8\textwidth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<echo=false>>=
+@
+\clearpage
+% \section{Frequentist bootstrap}
+% <<>>=
+% quantile(f, c(.025,.975))
+% @
+% \section{Bayesian Bootstrap }
+% <<>>=
+% quantile(b, c(.025,.975))
+% @
+% \section{Bayes from LaplacesDemon}
+% <<>>=
+% quantile(unlist(BB), c(.025,.975))
+% @
+\section{Standard Correlation Function}
+<<>>=
+cor.test(X[,1],X[,2])
+@
+\section{References}
+<<echo=FALSE>>=
+a<-"http://rsnippets.blogspot.ie/2012/11/possible-error-bayesian-bootstrap.html"
+b<-"http://rsnippets.blogspot.ie/2012/11/simple-bayesian-bootstrap.html"
+c<-"https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338"
+d<-"polya package in R"
+e<-"http://www.ism.ac.jp/editsec/aism/pdf/048_4_0663.pdf"
+f<-"http://www.people.fas.harvard.edu/~mparzen/published/parzen25.pdf"
+g<-"http://www.di.fc.ul.pt/~jpn/r/bootstrap/bootstrap.html"
+
+#Miller, R. G. (1974) The jackknife - a review. Biometrika, 61(1), 1-15.
+# 
+# Rubin, D. B. (1981). The Bayesian bootstrap. The annals of statistics, 9(1), 130-134.
+
+
+#h<-"http://www.bentley.edu/centers/sites/www.bentley.edu.centers/files/csbigs/huson.pdf"
+##is the above doubling sampling so incorrect?
+cat(paste(strwrap(a, width = 70), collapse = "\\\\\n"), "\n")
+cat(paste(strwrap(b, width = 70), collapse = "\\\\\n"), "\n")
+cat(paste(strwrap(c, width = 70), collapse = "\\\\\n"), "\n")
+cat(paste(strwrap(d, width = 70), collapse = "\\\\\n"), "\n")
+cat(paste(strwrap(e, width = 70), collapse = "\\\\\n"), "\n")
+cat(paste(strwrap(f, width = 70), collapse = "\\\\\n"), "\n")
+#cat(paste(strwrap(g, width = 70), collapse = "\\\\\n"), "\n")
+#cat(paste(strwrap(h, width = 70), collapse = "\\\\\n"), "\n")
+@
+\clearpage
+\section*{SOFTWARE AND SCRIPT VERSIONS}
+<<echo=false, results=hide>>=
+#Stangle(sweave.file)
+options(width=60)
+@
+\setstretch{1}
+<<echo=false, results=verbatim>>=
+sessionInfo()
+writeLines(strwrap(capture.output(getwd()), width=60))
+#paste("Sweave file: ", sweave.file, ".Rnw", sep = "")
+execution.time<-format(Sys.time(), "%X, %a, %b %d %Y"
+                       )
+execution.time2<-(proc.time() - start.time)[3][[1]]/60
+paste("Time to execute code (minutes)", round(execution.time2,2))
+paste("Executed:", execution.time)
+cat(paste(strwrap(getwd(), width = 70), collapse = "\\\\\n"), "\n")
+@
+
+
+\end{document}
