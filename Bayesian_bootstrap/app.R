@@ -26,6 +26,7 @@ fig.width4 <- 1380
 fig.height4 <- 300
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p2 <- function(x) {formatC(x, format="f", digits=2)}
+p3 <- function(x) {formatC(x, format="f", digits=3)}
 p5 <- function(x) {formatC(x, format="f", digits=5)}
 
 options(width=200)
@@ -438,14 +439,14 @@ server <- shinyServer(function(input, output   ) {
         z<-CorrNorm(n=n,rho=r)
         cor.test(z[,1],z[,2])
         
-        
+        data.set <- data.frame(z[,1],z[,2])
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         sboot <- function() {
-            cor(data.set[sample(1:9, replace=T),])[1,2]
+            cor(data.set[sample(1:n, replace=T),])[1,2]
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bboot <- function() {
-            cov.wt(data.set, diff(c(0,sort(runif(8)),1)), cor=T)$cor[1,2]
+            cov.wt(data.set, diff(c(0,sort(runif(n-1)),1)), cor=T)$cor[1,2]
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         X <- matrix(c(z[,1],z[,2]), length(z[,1]), 2)
@@ -467,57 +468,156 @@ server <- shinyServer(function(input, output   ) {
         return(list(f=f, b=b, BB=BB, xx1=xx1)) 
         
     })
+
+    
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
     output$diff2 <- renderPlot({         
+    
         
-        z <- mcmc()$A
+        f <- cor1()$f
+        b  <- cor1()$b
+        BB <-cor1()$BB
+        xx1 <- cor1()$xx1
         
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
-        par(bg = 'lightgoldenrodyellow') 
-        par(mfrow=c(1,3))
-        plot(density(z),
-             xlab="risk differnece trt - ctrl",
-             ylab="p(trt - ctrl | y, n)",
-             main="",
-             ylim=c(0,max(density(z)$y)),
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=0, col="red", lty='dashed')
+        ff <- qlogis(f)
+        bb <- qlogis(b)
+        BBB <- qlogis(BB)
+        xx <- qlogis(xx1)
         
-        z <- (mcmc()$B)
+        x <- c(.1,.2,.4,0.6,.8,.9, .97, .99, .999,.9999) #labels
+        q <- qlogis(x)   
         
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
+        require(ggplot2)
+        x1 <- xlab("")
+        est <- quantile(f, c(.025,.5,.975)) 
+        ff <- as.data.frame(ff)
         
-        plot(density(z), #log="x",
-             xlab="relative risk trt / ctrl",
-             ylab="p(trt / ctrl | y, n)",
-             main="",
-             ylim=c(0, max(density(z)$y)),##
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=1, col="red", lty='dashed')
+        pL1<- ggplot(data = ff, aes(x = ff)) + x1+   
+            geom_histogram(bins = 100, fill = rainbow(100))+
+            scale_x_continuous(limits = c(q[1], q[10]),
+                               breaks=q,  # this is where the values go
+                               labels= x)   +
+            labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+            theme_bw()  
+        pL1 <- pL1 + theme(axis.line=element_blank(),
+                           #axis.text.x=element_blank(),
+                           #axis.text.y=element_blank(),
+                           #axis.ticks=element_blank(),
+                           #axis.title.x=element_blank(),
+                           axis.text=element_text(size=8),
+                           axis.title=element_text(size=6,face="bold"),
+                           #axis.title.y=element_blank(),
+                           # legend.position="none",
+                           panel.background=element_blank(),
+                           panel.border=element_blank(),
+                           #panel.grid.major=element_blank(),
+                           #panel.grid.minor=element_blank(),
+                           # plot.background=element_blank())
+                           #plot.margin = unit(c(1,1,1,1), "cm")
+                           plot.title = element_text(size = 8)
+        )
         
-        z <- mcmc()$C
+        est <- quantile(b, c(.025,.5,.975))  
+        bb <- as.data.frame(bb)
+        pL2<- ggplot(data = bb, aes(x = bb)) +x1 +
+            geom_histogram(bins = 100, fill = rainbow(100))+
+            scale_x_continuous(limits = c(q[1], q[10]),
+                               breaks=q,   
+                               labels= x) +
+            labs(title = paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+            theme_bw()  
+        pL2 <- pL2 + theme(axis.line=element_blank(),
+                           #axis.text.x=element_blank(),
+                           #axis.text.y=element_blank(),
+                           #axis.ticks=element_blank(),
+                           #axis.title.x=element_blank(),
+                           axis.text=element_text(size=8),
+                           axis.title=element_text(size=6,face="bold"),
+                           #axis.title.y=element_blank(),
+                           # legend.position="none",
+                           panel.background=element_blank(),
+                           panel.border=element_blank(),
+                           #panel.grid.major=element_blank(),
+                           #panel.grid.minor=element_blank(),
+                           # plot.background=element_blank())
+                           #plot.margin = unit(c(1,1,1,1), "cm")
+                           plot.title = element_text(size = 8)
+        )
         
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
+        est <- quantile(BB, c(.025,.5,.975))  
+        BBB<- as.data.frame(BBB)
+        pL3<- ggplot(data = BBB, aes(x = BBB)) +x1+ 
+            geom_histogram(bins = 100, fill = rainbow(100))+
+            scale_x_continuous(limits = c(q[1], q[10]),
+                               breaks=q,   
+                               labels= x)   +
+            labs(title = paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+            theme_bw()  
+        pL3 <- pL3 + theme(axis.line=element_blank(),
+                           #axis.text.x=element_blank(),
+                           #axis.text.y=element_blank(),
+                           #axis.ticks=element_blank(),
+                           #axis.title.x=element_blank(),
+                           axis.text=element_text(size=8),
+                           axis.title=element_text(size=6,face="bold"),
+                           #axis.title.y=element_blank(),
+                           # legend.position="none",
+                           panel.background=element_blank(),
+                           panel.border=element_blank(),
+                           #panel.grid.major=element_blank(),
+                           #panel.grid.minor=element_blank(),
+                           # plot.background=element_blank())
+                           #plot.margin = unit(c(1,1,1,1), "cm")
+                           plot.title = element_text(size = 8)
+        )
         
-        plot(density(z),   #log="x",
-             xlab="odds ratio",
-             ylab="p(odds trt / odds ctrl | y, n)",
-             main="",
-             ylim=c(0, max(density(z)$y)),
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=1, col="red", lty='dashed')
-        captio=("xxxx")
+        
+        x1 <- xlab(" ")
+        est <- quantile(xx1, c(.025,.5,.975))  
+        xx<- as.data.frame(xx)
+        pL4<- ggplot(data = xx, aes(x = xx)) +x1+ 
+            geom_histogram(bins = 100, fill = rainbow(100))+
+            scale_x_continuous(limits = c(q[1], q[10]),
+                               breaks=q,   
+                               labels= x)   +
+            labs(title = paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+            theme_bw()  
+        pL4 <- pL4 + theme(axis.line=element_blank(),
+                           #axis.text.x=element_blank(),
+                           #axis.text.y=element_blank(),
+                           #axis.ticks=element_blank(),
+                           #axis.title.x=element_blank(),
+                           axis.text=element_text(size=8),
+                           axis.title=element_text(size=6,face="bold"),
+                           #axis.title.y=element_blank(),
+                           # legend.position="none",
+                           panel.background=element_blank(),
+                           panel.border=element_blank(),
+                           #panel.grid.major=element_blank(),
+                           #panel.grid.minor=element_blank(),
+                           # plot.background=element_blank())
+                           #plot.margin = unit(c(1,1,1,1), "cm")
+                           plot.title = element_text(size = 8)
+        )
         
         
         
-        par(mfrow=c(1,1))
+        
+        
+        gridExtra::grid.arrange(pL1,  pL2, pL3,  pL4, nrow=4) 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
