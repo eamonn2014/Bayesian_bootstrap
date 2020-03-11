@@ -81,7 +81,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                 div(h5("Enter the number of samples")), "100"),
                                       
                                       textInput('vec4', 
-                                                div(h5("Enter the true mean and sd for normal dist.")), "11, 41"),
+                                                div(h5("Enter the true mean and sd for normal dist.")), "10, 5"),
                                       
                                       textInput('n1y1', 
                                                 div(h5("Enter the number of samples")), "101"),
@@ -138,11 +138,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                column(width = 7, offset = 0, style='padding:0px;',
                                                       
                                                       h4("Prior distributions"), 
-                                                #      div(plotOutput("trt.plot", width=fig.width2, height=fig.height2)), 
+                                                      #      div(plotOutput("trt.plot", width=fig.width2, height=fig.height2)), 
                                                       
                                                       
                                                       h4("Posterior distributions updated with the observed data"), 
-                                                  #    div(plotOutput("trt.plot1", width=fig.width2, height=fig.height2)),       
+                                                      #    div(plotOutput("trt.plot1", width=fig.width2, height=fig.height2)),       
                                                       
                                                       
                                                       
@@ -156,16 +156,16 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            fluidRow(
                                                column(width = 5, offset = 0, style='padding:1px;',
                                                       
-                                                      h4("Posterior distributions summaries, P(efficacy) will be judged by P(trt>ctrl)"), 
-                                                     # div( verbatimTextOutput("reg.summary2"))
-                                                      )),
+                                                      h4("Frequentist bootstrap and Bayesian bootstrap posterior summary of distributions, median and 95% intervals and T-test estimates"), 
+                                                      div( verbatimTextOutput("reg.summary2"))
+                                               )),
                                            
                                            
                                            
-                                           h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
-                                           div(plotOutput("diff", width=fig.width3, height=fig.height3)),       
+                                           h4(paste("Frequentist and Bayesian posterior distributions")), 
+                                           div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
                                            
-                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
+                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
                                            
                                            
                                   ) ,
@@ -177,7 +177,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            
                                            h6("Sort and filter on the fly."),
                                            h4("Posterior distributions summaries, p(efficacy) will be judged by p(trt>ctrl)"), 
-                                         #  DT::dataTableOutput("tablex"),
+                                           #  DT::dataTableOutput("tablex"),
                                            h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
                                            div(plotOutput("diff2", width=fig.width4, height=fig.height4)),  
                                            h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
@@ -187,11 +187,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            h3("No prior information is used ! Also don't forget the confidence intervals cannot be interpreted
                                               that there is the stated probability that the true population parameter lies in the interval !"),
                                            h4("Fisher's Exact Test for Count Data"),
-                                        #   div( verbatimTextOutput("fisher")),
+                                           #   div( verbatimTextOutput("fisher")),
                                            h4("2-sample test for equality of proportions without continuity correction"), 
-                                        #   div( verbatimTextOutput("prop")),
+                                           #   div( verbatimTextOutput("prop")),
                                            h4("Logistic regression odds ratio"), 
-                                        #   div( verbatimTextOutput("logregx")),
+                                           #   div( verbatimTextOutput("logregx")),
                                            
                                            
                                            
@@ -230,7 +230,7 @@ server <- shinyServer(function(input, output   ) {
         # R
         n2y2 <- as.numeric(unlist(strsplit(input$n2y2,",")))
         
-        sims <- input$sims
+        sims <- as.numeric(unlist(strsplit(input$sims,",")))
         
         return(list( #prob1=i[1],prob2=j[1],prob3=i[2],prob4=j[2],prob5=i[3],prob6=j[3],
             trt.alpha=trt[1],  
@@ -247,22 +247,19 @@ server <- shinyServer(function(input, output   ) {
         
         sample <- random.sample()
         
-        n  <- trt.alpha<- sample$trt.alpha
-       # b  <- trt.beta<-sample$trt.beta
+        n   <- trt.alpha <- sample$trt.alpha
         mu1 <- sample$ctr.alpha
         sd1 <- sample$ctr.beta
         
-        #
-        n1 <- sample$n1  #trt
-        r <- sample$n2
-        # sd2 <- sample$y2
-        # sims <- sample$sims
+        #n1   <- sample$n1  
+        # r    <- sample$n2
+        reps <- sims <- sample$sims
         
+        x <- rnorm(n, mean=mu1, sd=sd1)
+        #reps <- 10
         
+        # simulations
         
-        
-        
-        I = 1000                                # simulations
         require(Hmisc)
         dboot <- function(data.set) {
             u <- c(0, sort(runif(length(data.set) - 1)), 1)
@@ -284,34 +281,39 @@ server <- shinyServer(function(input, output   ) {
             replicate(n, mean(sample(x, length(x), TRUE)))
         }
         
+        
+        
+        
+        
+        
+        
         #set.seed(2131)
-        reps <- I
-        x <- rnorm(100, mean=0, sd=1)
+        #reps <- I
+        #reps <- 10
+       # x <- rnorm(100, mean=0, sd=1)
+      #  x <- rnorm(n, mean=mu1, sd=sd1)
+        
+        
         fbq<-bbq<-bb2<-NULL
         
         system.time(A <- mean.fb(x, reps))
-        system.time(B <- (mean.bb(x, reps)))
+        system.time(B <- mean.bb(x, reps))
         system.time(C <- replicate(reps, dboot(x)))
         
-        
-        
-        fbq <- quantile(A, c(0.025, 0.975)) 
-        bbq <- quantile(B, c(0.025, 0.975))
-        bb2 <- quantile(C, c(0.025, 0.975))
+        fbq <- quantile(A, c(.5,0.025, 0.975)) 
+        bbq <- quantile(B, c(.5,0.025, 0.975))
+        bb2 <- quantile(C, c(.5,0.025, 0.975))
         
         y <- t.test(x)
-        A1 <- cbind("Frequentist 95% CI from "   , p5(fbq[1]), p5(fbq[2]))
-        B1 <- cbind("Bayesian 95% CI from "      , p5(bbq[1]), p5(bbq[2]))
-        C1 <- cbind("EOB's Bayesian 95% CI from ", p5(bb2[1]), p5(bb2[2]))
-        D1 <- cbind("T-test ", p5(y$conf.int[1]), p5(y$conf.int[2]))
+        A1 <- cbind("Frequentist Median, 95% CI "   ,  p5(fbq[1]), p5(fbq[2]),  p5(fbq[3])  )
+        B1 <- cbind("Bayesian Median, 95% CI "      ,  p5(bbq[1]), p5(bbq[2])  ,p5(bbq[3]))
+        C1 <- cbind("EOB's Bayesian Median, 95% CI ",  p5(bb2[1]), p5(bb2[2]) , p5(bb2[3]))
+        D1 <- cbind("T-test Mean, 95%CI ",p5(y$estimate[1][[1]]), p5(y$conf.int[1]), p5(y$conf.int[2]))
         
         res <- rbind(A1,B1,C1,D1)
         rownames(res) <- NULL
-  
         
-        
-        
-        return(list(res=res , A=A, B=B, C=C )) 
+        return(list(res=res , A=A, B=B, C=C , mu1=mu1)) 
         
     })
     
@@ -320,47 +322,53 @@ server <- shinyServer(function(input, output   ) {
     output$diff <- renderPlot({         
         
         z <- mcmc()$A
+        mu1 <- mcmc()$mu1
         
         q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
         par(bg = 'lightgoldenrodyellow') 
         par(mfrow=c(1,3))
         plot(density(z),
-             xlab="risk differnece trt - ctrl",
-             ylab="p(trt - ctrl | y, n)",
+             xlab="Freq. Bootstrap, Mean estimate",
+             ylab="Density",
              main="",
              ylim=c(0,max(density(z)$y)),
              frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
         abline(v=q[1], col="blue") #95% credible interval
         abline(v=q[5], col="blue")
-        abline(v=0, col="red", lty='dashed')
+        abline(v=q[3], col="red", lty='dashed')
+        abline(v=mu1, col="black", lty='dashed')
         
         z <- (mcmc()$B)
         
         q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
         
-        plot(density(z), log="x",
-             xlab="relative risk trt / ctrl",
-             ylab="p(trt / ctrl | y, n)",
+        plot(density(z), #log="x",
+             xlab="Bayesian Bootstrap, Mean estimate",
+             ylab="Density",
              main="",
              ylim=c(0, max(density(z)$y)),##
              frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
         abline(v=q[1], col="blue") #95% credible interval
         abline(v=q[5], col="blue")
-        abline(v=1, col="red", lty='dashed')
+        abline(v=q[3], col="red", lty='dashed')
+        abline(v=mu1, col="black", lty='dashed')
+        
         
         z <- mcmc()$C
         
         q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
         
-        plot(density(z),   log="x",
-             xlab="odds ratio",
-             ylab="p(odds trt / odds ctrl | y, n)",
+        plot(density(z), #  log="x",
+             xlab="Bayesian Bootstrap 2, Mean estimate",
+             ylab="Density",
              main="",
              ylim=c(0, max(density(z)$y)),
              frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
         abline(v=q[1], col="blue") #95% credible interval
         abline(v=q[5], col="blue")
-        abline(v=1, col="red", lty='dashed')
+        abline(v=q[3], col="red", lty='dashed')
+        abline(v=mu1, col="black", lty='dashed')
+        
         captio=("xxxx")
         
         
@@ -402,52 +410,64 @@ server <- shinyServer(function(input, output   ) {
         
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    output$trt.plot1 <- renderPlot({         
-        
-        # x<- seq(0.001,.999, length.out=10000)
-        # 
-        # sample <- random.sample()
-        # 
-        # a  <- sample$trt.alpha
-        # b  <- sample$trt.beta
-        # a1 <- sample$ctr.alpha
-        # b1 <- sample$ctr.beta
-        # 
-        # n1 <- sample$n1   
-        # y1 <- sample$y1
-        # n2 <- sample$n2
-        # y2 <- sample$y2
-        # 
-        # tmp1 <- max(c(dbeta(x,y1+a,  n1-y1+b)  ) )
-        # tmp2 <- max(c(dbeta(x,y2+a1, n2-y2+b1)))
-        # tmp <- max(tmp1, tmp2)
-        # 
-        # par(bg = 'lightgoldenrodyellow')
-        # 
-        # curve(dbeta(x, y1+a, n1-y1+b),col = "blue", xlab = c("Probabiity"), 
-        #       main=paste0("The Beta distribution for treatment in blue with shape parameters (",p2(y1+a),", ",p2(n1-y1+b),") and control in black (",p2(y2+a1),", ",p2(n2-y2+b1),")"  
-        #       ),
-        #       ylab = "Density", xlim=c(0.0,1),  ylim=c(0, (tmp)*1.1) #ylim=c(0, max(tmp1)),
-        #       
-        # )
-        # curve(dbeta(x, y2+a1,  n2-y2+b1),col = "black", xlab = c("Probabiity"), 
-        #       
-        #       ylab = "Density" , add=TRUE
-        #       
-        # )
-        
-        
-        
-    })
+    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    # output$reg.summary2 <- renderPrint({
-    #     
-    #     return(print(mcmc()$f1, digits=4))
+    output$reg.summary2 <- renderPrint({
         
-    # })
+        return(print(mcmc()$res, digits=4))
+        
+    })
     # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cor1 <- reactive({
+        
+        sample <- random.sample()
+        
+        n    <- sample$n1  
+        r    <- sample$n2
+        reps <- sims <- sample$sims
+        
+        
+        CorrNorm <- function(n, rho) {
+            X1 = rnorm(n); X2 = rnorm(n)
+            Z = cbind(X1, rho*X1+sqrt(1-rho^2)*X2)
+            return(Z)
+        } 
+        
+        z<-CorrNorm(n=n,rho=r)
+        cor.test(z[,1],z[,2])
+        
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        sboot <- function() {
+            cor(data.set[sample(1:9, replace=T),])[1,2]
+        }
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        bboot <- function() {
+            cov.wt(data.set, diff(c(0,sort(runif(8)),1)), cor=T)$cor[1,2]
+        }
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        X <- matrix(c(z[,1],z[,2]), length(z[,1]), 2)
+        library(LaplacesDemon)
+        BB <- BayesianBootstrap(X=X, n=sims,
+                                Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        library(bayesboot)
+        # Using the weighted correlation (corr) from the boot package.
+        library(boot)
+        b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        f <- replicate(sims, sboot())
+        b <- replicate(sims, bboot())
+        BB <- unlist(BB)
+        xx1 <- b4$V1
+        
+        return(list(f=f, b=b, BB=BB, xx1=xx1)) 
+        
+    })
+    
     
     output$diff2 <- renderPlot({         
         
@@ -470,7 +490,7 @@ server <- shinyServer(function(input, output   ) {
         
         q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
         
-        plot(density(z), log="x",
+        plot(density(z), #log="x",
              xlab="relative risk trt / ctrl",
              ylab="p(trt / ctrl | y, n)",
              main="",
@@ -484,7 +504,7 @@ server <- shinyServer(function(input, output   ) {
         
         q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
         
-        plot(density(z),   log="x",
+        plot(density(z),   #log="x",
              xlab="odds ratio",
              ylab="p(odds trt / odds ctrl | y, n)",
              main="",
