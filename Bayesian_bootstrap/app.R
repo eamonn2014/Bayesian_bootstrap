@@ -20,8 +20,8 @@ fig.width <- 400
 fig.height <- 300
 fig.width2 <- 1400
 fig.height2 <- 300#50
-fig.width3 <- 1300  
-fig.height3 <- 350#400
+fig.width3 <- 600  
+fig.height3 <- 600#400
 fig.width4 <- 1380
 fig.height4 <- 300
 p1 <- function(x) {formatC(x, format="f", digits=1)}
@@ -180,7 +180,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            h4("Posterior distributions summaries, p(efficacy) will be judged by p(trt>ctrl)"), 
                                            #  DT::dataTableOutput("tablex"),
                                            h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
-                                           div(plotOutput("diff2", width=fig.width4, height=fig.height4)),  
+                                           div(plotOutput("diff2", width=fig.width3, height=fig.height3)),  
                                            h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
                                   ),
                                   
@@ -487,8 +487,21 @@ server <- shinyServer(function(input, output   ) {
         BBB <- qlogis(BB)
         xx <- qlogis(xx1)
         
-        x <- c(.1,.2,.4,0.6,.8,.9, .97, .99, .999,.9999) #labels
+        
+        
+        all <- c(f,b,BB,xx1)
+        minx <- min(all)
+        maxx <- max(all)
+        b <- c(minx, maxx)
+        
+        a <- x <- c(.01,0.05,0.1,0.2,0.4,0.6,0.8,0.9, 0.97, 0.99, 0.999,0.9999) #labels
         q <- qlogis(x)   
+        
+        lims <- unique(a[sapply(b,function(x) which.min(abs(x-a)))])
+        
+        indx <- which(x %in% lims)
+        limz <- x[indx[1]:indx[2]]
+        
         
         require(ggplot2)
         x1 <- xlab("")
@@ -497,9 +510,9 @@ server <- shinyServer(function(input, output   ) {
         
         pL1<- ggplot(data = ff, aes(x = ff)) + x1+   
             geom_histogram(bins = 100, fill = rainbow(100))+
-            scale_x_continuous(limits = c(q[1], q[10]),
-                               breaks=q,  # this is where the values go
-                               labels= x)   +
+            scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
+                               breaks= q[indx[1]:indx[2]],  # this is where the values go
+                               labels= x[indx[1]:indx[2]])   + 
             labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL1 <- pL1 + theme(axis.line=element_blank(),
@@ -524,9 +537,9 @@ server <- shinyServer(function(input, output   ) {
         bb <- as.data.frame(bb)
         pL2<- ggplot(data = bb, aes(x = bb)) +x1 +
             geom_histogram(bins = 100, fill = rainbow(100))+
-            scale_x_continuous(limits = c(q[1], q[10]),
-                               breaks=q,   
-                               labels= x) +
+          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
+                             breaks= q[indx[1]:indx[2]],  # this is where the values go
+                             labels= x[indx[1]:indx[2]])   + 
             labs(title = paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL2 <- pL2 + theme(axis.line=element_blank(),
@@ -551,9 +564,9 @@ server <- shinyServer(function(input, output   ) {
         BBB<- as.data.frame(BBB)
         pL3<- ggplot(data = BBB, aes(x = BBB)) +x1+ 
             geom_histogram(bins = 100, fill = rainbow(100))+
-            scale_x_continuous(limits = c(q[1], q[10]),
-                               breaks=q,   
-                               labels= x)   +
+          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
+                             breaks= q[indx[1]:indx[2]],  # this is where the values go
+                             labels= x[indx[1]:indx[2]])   + 
             labs(title = paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL3 <- pL3 + theme(axis.line=element_blank(),
@@ -580,9 +593,9 @@ server <- shinyServer(function(input, output   ) {
         xx<- as.data.frame(xx)
         pL4<- ggplot(data = xx, aes(x = xx)) +x1+ 
             geom_histogram(bins = 100, fill = rainbow(100))+
-            scale_x_continuous(limits = c(q[1], q[10]),
-                               breaks=q,   
-                               labels= x)   +
+          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
+                             breaks= q[indx[1]:indx[2]],  # this is where the values go
+                             labels= x[indx[1]:indx[2]])   + 
             labs(title = paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL4 <- pL4 + theme(axis.line=element_blank(),
