@@ -1,3 +1,5 @@
+
+# one sample mean bootstrap
 #http://rsnippets.blogspot.ie/2012/11/possible-error-bayesian-bootstrap.html
 require(Hmisc)
 dboot <- function(data.set) {
