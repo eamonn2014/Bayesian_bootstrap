@@ -649,136 +649,97 @@ server <- shinyServer(function(input, output   ) {
           b  <- cor1()$b
           BB <-cor1()$BB
           xx1 <- cor1()$xx1
+          
+          sample <- random.sample()
+          
+       #   n    <- sample$n1
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # new
-        # ff <- qlogis(f)
-        # bb <- qlogis(b)
-        # BBB <- qlogis(BB)
-        # xx <- qlogis(xx1)
-        # foo <- cbind(ff,bb,BBB,xx)
-        # foo1 <- reshape::melt(foo)
-        # 
-        # #all <- c(f,b,BB,xx1)
-        # #minx <- min(all)
-        # #maxx <- max(all)
-        # #bz <- c(minx, maxx)
-        # a<- x <- c(0.001, 0.003,0.01, 0.05,seq(.1,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9997,0.9999)#labels
-        # 
-        # q <- qlogis(x)   
-        # 
-        # bz <- c(min(a), max(a))
-        # 
-        # lims <- unique(a[sapply(bz,function(x) which.min(abs(x-a)))])
-        # 
-        # indx <- which(x %in% lims)
-        # #limz <- x[indx[1]:indx[2]]
-        # i = indx[1]-1
-        # if (i %in% 0) {i=1} 
-        # if (i > length(a)) {i=length(a)-1} 
-        # j=  indx[2]+1
-        # 
-        # 
-        # 
-        # limitz = c(q[i], q[j])
-        # breakz = q[i:j]
-        # labelz = x[i:j]
-        # 
-        # ggplot(data=foo1, aes(x = value)) +#
-        #   geom_histogram( bins=100, colour="blue", fill="blue")+
-        #   facet_grid(X2~ .)  +
-        # scale_x_continuous(limits =limitz,
-        #                    breaks= breakz,  # this is where the values go
-        #                    labels= labelz)   
-        
-         
-      #~~~~~~~~~~~~~~~~~~~~~~~promising############################################################
+ 
         ff <-  (f)
         bb <- (b)
         BBB <- (BB)
         xx <- (xx1)
         foo <- cbind(ff,bb,BBB,xx)
         foo1 <- reshape::melt(foo)
-        
-     #  p <- c(0.001, 0.003,0.01, 0.05,seq(.2,0.9,0.2),.9,.95,.98,.99,0.995,0.998,0.999, 0.9995,0.9998,0.9999)#l
-      #  require(scales)
-        # ggplot(data=foo1, aes(x = value)) +#
-        #   geom_histogram( bins=100, colour="blue", fill="blue")+
-        #   facet_grid(X2~ .)  +
-        #   scale_x_continuous(trans = logit_trans(),
-        # breaks= p) 
-        # 
-        # 
-        
-        #p <- c(0.001, 0.003,0.01, 0.05,seq(.2,0.9,0.2),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#l
-       # require(scales)
-        #ggplot(data=foo1, aes(x = value)) +#
-         # geom_histogram( bins=100, colour="blue", fill="blue")+
-          #facet_grid(X2~ .)  +
-          #scale_x_continuous(trans = logit_trans()  ,
-           #                  breaks= p)
+ 
         
         levels(foo1$X2)
         
-        est <- quantile(f, c(.025,.5,.975)) 
-      C <-  paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+      Ce <-  est <- quantile(f, c(.025,.5,.975)) 
+      C <-  paste("Frequentist : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
 
-        est <- quantile(b, c(.025,.5,.975))  
-      A <-  paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+     Ae <-   est <- quantile(b, c(.025,.5,.975))  
+      A <-  paste("Bayesian : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
 
-        est <- quantile(BB, c(.025,.5,.975))  
-      B <-  paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+      Be<-  est <- quantile(BB, c(.025,.5,.975))  
+      B <-  paste("LaplaceDemon : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
 
-        est <- quantile(xx1, c(.025,.5,.975))  
-     D <-   paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+    De<-    est <- quantile(xx1, c(.025,.5,.975))  
+     D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
 
 
-        
-        
-         
-         levels(foo1$X2) <- c(paste("Bayesian Bootstrap",A),
-                              paste("LaplaceDemon",B),
-                              paste("Frequentist",C),
-                              paste("Bayesboot",D)
+     dummy2 <- data.frame(X2=c(paste("",A),
+                            paste("",B),
+                            paste("",C),
+                            paste("",D)
+     ),  
+                          q1 =  c(Ae[1], Be[1], Ce[1], De[1]),
+                          q50 = c(Ae[2], Be[2], Ce[2], De[2]),
+                          q3 =  c(Ae[3], Be[3], Ce[3], De[3])
+                          )
+     # dummy2 <- data.frame(X2 = c(paste("",A),
+     #                             paste("",B),
+     #                             paste("",C),
+     #                             paste("",D)
+     # ), 
+     #                      q1 =  c(Ae[1], Be[1], Ce[1], De[1])
+     #                     
+     # )
+     
+         levels(foo1$X2) <- c(paste("",A),
+                              paste("",B),
+                              paste("",C),
+                              paste("",D)
                               )
          
-        p <- c(-.9, -.5,0.01, 0.05, seq(.2,0.8,0.4),.9,.99,0.999,   0.9999)#l
-        # require(scales)
-        # ggplot(data=foo1, aes(x = value)) +#
-        #   geom_histogram( bins=100, colour="blue", fill=rainbow(400))+
-        #   facet_wrap(X2~ .)  +
-        #   scale_x_continuous(trans = logit_trans()  ,
-        #                      breaks= p, 
-        #                      limits=c(-.9,.9999))
-        # 
-        
+
         p <- c(-.9, .9,-.99,.99 , -.95, .95,seq(-.8,.8,0.2))  
         
         library(scales)
        g0 <- ggplot(data=foo1, aes(x = value)) +#
-          geom_histogram( bins=100, colour="blue")+  #, fill=rainbow(400)
+          geom_histogram( bins=100, colour="blue" , fill=rainbow(400))+  
+         geom_vline(data = dummy2, aes(xintercept = q1)) +
+         geom_vline(data = dummy2, aes(xintercept = q50)) +
+         geom_vline(data = dummy2, aes(xintercept = q3)) +
           facet_wrap(X2~ .) 
        
-        
-    #   g0 +   scale_x_continuous(trans = atanh_trans()  ,
-     ##                        breaks= p, 
-       #                      limits=c(-.99,.99))
    
-       g0  + scale_x_continuous(trans = atanh_trans()  ,
-                               breaks= p, 
-                              limits=c(-.99,.99),oob=censor)
+      g0 <-    g0  + scale_x_continuous(trans = atanh_trans()  ,
+                                        breaks= p, xlab("Correlation"),
+                                        oob=discard) +
         
-         
-        #g0  + scale_x_continuous(trans = atanh_trans()  ,
-         #                       breaks= p, 
-          #                     limits=c(-.99,.99),oob=squish)
-          
-       #not bad
- #       g0  + scale_x_continuous(trans = atanh_trans()  ,
-  #                               breaks= p, 
-   #                              limits=c(-.99,.99),oob=discard)
-        ## really wacky, but perhaps useful sometimes
-      
         
+      theme_bw()  
+   
+        
+      g0 <- g0 + theme(axis.line=element_blank(),
+                         #axis.text.x=element_blank(),
+                         #axis.text.y=element_blank(),
+                         #axis.ticks=element_blank(),
+                         #axis.title.x=element_blank(),
+                         axis.text=element_text(size=12),
+                         axis.title=element_text(size=12,face="bold"),
+                         #axis.title.y=element_blank(),
+                         # legend.position="none",
+                         panel.background=element_blank(),
+                         panel.border=element_blank(),
+                         #panel.grid.major=element_blank(),
+                         #panel.grid.minor=element_blank(),
+                         # plot.background=element_blank())
+                         #plot.margin = unit(c(1,1,1,1), "cm")
+                         plot.title = element_text(size = 16),
+                       strip.text.x = element_text(size = 16, colour = "black", angle = 0),
+                       strip.background = element_rect(fill="ivory"))
         print(g0)
         
         
