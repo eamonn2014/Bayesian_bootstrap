@@ -95,7 +95,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                 div(h5("Enter the true correlation")), ".8"),
                                       
                                       textInput('sims', 
-                                                div(h5("Monte Carlo simulations")), "1000"),
+                                                div(h5("Monte Carlo simulations")), "10000"),
                                       div(h5("References:")),  
                                       
                                       tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", "[1] Efron"),
@@ -189,15 +189,28 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   ),
                                   
                                   tabPanel("3 Frequentist analysis", value=3, 
-                                           h3("No prior information is used ! Also don't forget the confidence intervals cannot be interpreted
-                                              that there is the stated probability that the true population parameter lies in the interval !"),
-                                           h4("Fisher's Exact Test for Count Data"),
+                                           h3("xxxxxxxxxxxxxxxx"),
+                                           h4("xxxxxxxxxxxxxxxxx"),
                                            #   div( verbatimTextOutput("fisher")),
-                                           h4("2-sample test for equality of proportions without continuity correction"), 
+                                           #h4("2-sample test for equality of proportions without continuity correction"), 
                                            #   div( verbatimTextOutput("prop")),
-                                           h4("Logistic regression odds ratio"), 
+                                           #h4("Logistic regression odds ratio"), 
                                            #   div( verbatimTextOutput("logregx")),
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
+                                           
+                                           
+                                  ),
+                                  
+                                  
+                                  tabPanel("3 Ruben data", value=3, 
+                                           h3("xxxxxxxxxxxxxxxx"),
+                                           h4("xxxxxxxxxxxxxxxxx"),
+                                           #   div( verbatimTextOutput("fisher")),
+                                           #h4("2-sample test for equality of proportions without continuity correction"), 
+                                           #   div( verbatimTextOutput("prop")),
+                                           #h4("Logistic regression odds ratio"), 
+                                           #   div( verbatimTextOutput("logregx")),
+                                           div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
                                            
                                            
                                   )
@@ -677,7 +690,8 @@ server <- shinyServer(function(input, output   ) {
     De<-    est <- quantile(xx1, c(.025,.5,.975))  
      D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
 
-
+#make a dataset to add lines to ggplot facets
+     
      dummy2 <- data.frame(X2=c(paste("",A),
                             paste("",B),
                             paste("",C),
@@ -687,14 +701,7 @@ server <- shinyServer(function(input, output   ) {
                           q50 = c(Ae[2], Be[2], Ce[2], De[2]),
                           q3 =  c(Ae[3], Be[3], Ce[3], De[3])
                           )
-     # dummy2 <- data.frame(X2 = c(paste("",A),
-     #                             paste("",B),
-     #                             paste("",C),
-     #                             paste("",D)
-     # ), 
-     #                      q1 =  c(Ae[1], Be[1], Ce[1], De[1])
-     #                     
-     # )
+    
      
          levels(foo1$X2) <- c(paste("",A),
                               paste("",B),
@@ -702,26 +709,24 @@ server <- shinyServer(function(input, output   ) {
                               paste("",D)
                               )
          
-
-        p <- c(-.9, .9,-.99,.99 , -.95, .95,seq(-.8,.8,0.2))  
+        p <- c(-.9, .9,-.99,.99 , -.95, .95,.8,-.8,seq(-.6,.6,0.3))  
         
         library(scales)
        g0 <- ggplot(data=foo1, aes(x = value)) +#
-          geom_histogram( bins=100, colour="blue" , fill=rainbow(400))+  
-         geom_vline(data = dummy2, aes(xintercept = q1)) +
-         geom_vline(data = dummy2, aes(xintercept = q50)) +
-         geom_vline(data = dummy2, aes(xintercept = q3)) +
+          geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
+          geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
+          geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
+         geom_histogram( bins=100, colour="black" , fill=rainbow(400))+     ylab("")+
           facet_wrap(X2~ .) 
        
    
-      g0 <-    g0  + scale_x_continuous(trans = atanh_trans()  ,
+          g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
                                         breaks= p, xlab("Correlation"),
                                         oob=discard) +
-        
-        
+            scale_y_continuous(breaks = NULL) +
+
       theme_bw()  
    
-        
       g0 <- g0 + theme(axis.line=element_blank(),
                          #axis.text.x=element_blank(),
                          #axis.text.y=element_blank(),
@@ -730,20 +735,156 @@ server <- shinyServer(function(input, output   ) {
                          axis.text=element_text(size=12),
                          axis.title=element_text(size=12,face="bold"),
                          #axis.title.y=element_blank(),
-                         # legend.position="none",
+                         legend.position="none",
                          panel.background=element_blank(),
-                         panel.border=element_blank(),
                          #panel.grid.major=element_blank(),
                          #panel.grid.minor=element_blank(),
                          # plot.background=element_blank())
                          #plot.margin = unit(c(1,1,1,1), "cm")
                          plot.title = element_text(size = 16),
                        strip.text.x = element_text(size = 16, colour = "black", angle = 0),
-                       strip.background = element_rect(fill="ivory"))
+                       strip.background = element_rect(fill="ivory"),
+                       panel.border = element_blank())
         print(g0)
         
         
     })
+        #
+        #################################################################
+        
+        
+        output$diff4 <- renderPlot({      
+          
+          
+          sample <- random.sample()
+          
+    
+          reps <- sims <- sample$sims
+          
+          
+          library(LaplacesDemon)
+          dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
+          efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
+          data.set <- data.frame(dye,efp)
+         
+          len <- length(dye)
+          
+            sboot <- function() {
+              cor(data.set[sample(1:len, replace=T),])[1,2]
+            }
+            
+            bboot <- function() {
+              cov.wt(data.set, diff(c(0,sort(runif(len-1)),1)), cor=T)$cor[1,2]
+            }
+            
+            
+            X <- matrix(c(dye,efp), len, 2)
+          colnames(X) <- c("dye","efp")
+          BB <- BayesianBootstrap(X=X, n=sims,
+                                  Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
+           
+            library(bayesboot)
+          # Using the weighted correlation (corr) from the boot package.
+          library(boot)
+          b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
+          
+          
+          #   x <- c(.3,.4,0.6,.8,.9, .96, .99, .999,.9999,.99995) #labels
+          # q <- qlogis(x)                                       #plot at these points
+          
+          f<-replicate(sims, sboot())
+          b<-replicate(sims, bboot())
+          BB <- unlist(BB)
+          xx1 <- b4$V1
+          
+          #   n    <- sample$n1
+          #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          
+          ff <-  (f)
+          bb <- (b)
+          BBB <- (BB)
+          xx <- (xx1)
+          foo <- cbind(ff,bb,BBB,xx)
+          foo1 <- reshape::melt(foo)
+          
+          
+          levels(foo1$X2)
+          
+          Ce <-  est <- quantile(f, c(.025,.5,.975)) 
+          C <-  paste("Frequentist : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+          
+          Ae <-   est <- quantile(b, c(.025,.5,.975))  
+          A <-  paste("Bayesian : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+          
+          Be<-  est <- quantile(BB, c(.025,.5,.975))  
+          B <-  paste("LaplaceDemon : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+          
+          De<-    est <- quantile(xx1, c(.025,.5,.975))  
+          D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+          
+          #make a dataset to add lines to ggplot facets
+          
+          dummy2 <- data.frame(X2=c(paste("",A),
+                                    paste("",B),
+                                    paste("",C),
+                                    paste("",D)
+          ),  
+          q1 =  c(Ae[1], Be[1], Ce[1], De[1]),
+          q50 = c(Ae[2], Be[2], Ce[2], De[2]),
+          q3 =  c(Ae[3], Be[3], Ce[3], De[3])
+          )
+          
+          
+          levels(foo1$X2) <- c(paste("",A),
+                               paste("",B),
+                               paste("",C),
+                               paste("",D)
+          )
+          
+          p <- c(-.9, .9,-.99,.99 ,.995,.999, .9999, -.95, .95,seq(-.8,.8,0.2))  
+          p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
+          library(scales)
+          g0 <- ggplot(data=foo1, aes(x = value)) +#
+            geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
+            geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
+            geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
+            geom_histogram( bins=100, colour="black" , fill=rainbow(400))+  ylab("")+
+            facet_wrap(X2~ .) 
+          
+          
+          g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
+                                         breaks= p, xlab("Correlation"),
+                                         oob=discard) +
+            scale_y_continuous(breaks = NULL) +
+            
+            theme_bw()  
+          
+          g0 <- g0 + theme(axis.line=element_blank(),
+                           #axis.text.x=element_blank(),
+                           #axis.text.y=element_blank(),
+                           #axis.ticks=element_blank(),
+                           #axis.title.x=element_blank(),
+                           axis.text=element_text(size=12),
+                           axis.title=element_text(size=12,face="bold"),
+                           #axis.title.y=element_blank(),
+                           legend.position="none",
+                           panel.background=element_blank(),
+                           #panel.grid.major=element_blank(),
+                           #panel.grid.minor=element_blank(),
+                           # plot.background=element_blank())
+                           #plot.margin = unit(c(1,1,1,1), "cm")
+                           plot.title = element_text(size = 16),
+                           strip.text.x = element_text(size = 16, colour = "black", angle = 0),
+                           strip.background = element_rect(fill="ivory"),
+                           panel.border = element_blank())
+          print(g0)
+          
+          
+        })
+        
+        
+        
+        
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     output$tablex <- DT::renderDataTable({
         
