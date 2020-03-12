@@ -51,7 +51,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h2("Bayesian bootstrap"),
                 
-                h4("xxxxxxxxxxxx
+                h4("There is a Bayesian analogue of the familiar frequentist bootstrap. We investigate using a coded up function and two
+                functions from R packages. We also run a frequentist bootstrap. We look at estimating a mean from a normal distribution and 
+                corellation coefficient between two samples. In the case of the mean n-1 unifrom samples are drawn and the n gaps then become 
+                the probabilities for incorporation in the boostrap sample [1]. We also use a published dataset to estimate correlation.
               "), 
                 
                 h3("  "), 
@@ -70,7 +73,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   br(), # br(), 
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
-                                  h4("xxxxxxxxxxxxxxxxxxxxxxxx."),
+                                  h4("The first input is the number of Monte Carlo simulations. The next two inputs are the number of samples and
+                                     the true mean and standard deviation. The next experiment is estimating the uncertainty in a correlation 
+                                     coefficient. So we enter the the number of samples (in each of two groups) and then the true correlation between
+                                     the two groups."),
                                   div(
                                       
                                       tags$head(
@@ -81,21 +87,22 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
                                       
-                                      
+                                      textInput('sims', 
+                                                div(h5("Monte Carlo simulations")), "10000"),
+                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
                                       textInput('vec3', 
-                                                div(h5("Enter the number of samples")), "100"),
+                                                div(h5("Number of samples for mean")), "100"),
                                       
                                       textInput('vec4', 
-                                                div(h5("Enter the true mean and sd for normal dist.")), "10, 5"),
-                                      
+                                                div(h5("Enter the true mean and sd for a normal distribution.")), "10, 5"),
+                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
                                       textInput('n1y1', 
-                                                div(h5("Enter the number of samples")), "10"),
+                                                div(h5("Number of samples for Correlation")), "10"),
                                       
                                       textInput('n2y2', 
                                                 div(h5("Enter the true correlation")), ".8"),
-                                      
-                                      textInput('sims', 
-                                                div(h5("Monte Carlo simulations")), "10000"),
+                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+                                 
                                       div(h5("References:")),  
                                       
                                       tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", "[1] Efron"),
@@ -134,28 +141,28 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
                    ")),
                                   
-                                  tabPanel("1 Estimating the uncertanty in one sample mean", value=7, 
-                                           
-                                           
-                                           fluidRow(
-                                               
-                                               
-                                               column(width = 7, offset = 0, style='padding:0px;',
-                                                      
-                                                      h4("Prior distributions"), 
-                                                      #      div(plotOutput("trt.plot", width=fig.width2, height=fig.height2)), 
-                                                      
-                                                      
-                                                      h4("Posterior distributions updated with the observed data"), 
-                                                      #    div(plotOutput("trt.plot1", width=fig.width2, height=fig.height2)),       
-                                                      
-                                                      
-                                                      
-                                               ))
-                                           
-                                  ) ,
+                                  # tabPanel("1 Empty", value=7, 
+                                  #          
+                                  #          
+                                  #          fluidRow(
+                                  #              
+                                  #              
+                                  #              column(width = 7, offset = 0, style='padding:0px;',
+                                  #                     
+                                  #                     h4("Prior distributions"), 
+                                  #                     #      div(plotOutput("trt.plot", width=fig.width2, height=fig.height2)), 
+                                  #                     
+                                  #                     
+                                  #                     h4("Posterior distributions updated with the observed data"), 
+                                  #                     #    div(plotOutput("trt.plot1", width=fig.width2, height=fig.height2)),       
+                                  #                     
+                                  #                     
+                                  #                     
+                                  #              ))
+                                  #          
+                                  # ) ,
                                   
-                                  tabPanel("2 Estimating the uncertanty in a correlation coefficient", value=7, 
+                                  tabPanel("1 Estimating a one sample mean", value=7, 
                                            
                                            
                                            fluidRow(
@@ -167,7 +174,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            
                                            
                                            
-                                           h4(paste("Frequentist and Bayesian posterior distributions")), 
+                                           h4(paste("dump this")), 
                                            div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
                                            
                                            h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
@@ -178,17 +185,17 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   
                                   
                                   
-                                  tabPanel("2 Same results using datatable function", value=3, 
-                                           
-                                           h6("Sort and filter on the fly."),
-                                           h4("Posterior distributions summaries, p(efficacy) will be judged by p(trt>ctrl)"), 
-                                           #  DT::dataTableOutput("tablex"),
-                                           h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
-                                           div(plotOutput("diff2", width=fig.width3, height=fig.height3)),  
-                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
-                                  ),
+                                  # tabPanel("Frequentist and Bayesian posterior distributions of Mean", value=3, 
+                                  #          
+                                  #          h6("Sort and filter on the fly."),
+                                  #          h4("Posterior distributions summaries, p(efficacy) will be judged by p(trt>ctrl)"), 
+                                  #          #  DT::dataTableOutput("tablex"),
+                                  #          h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
+                                  #          div(plotOutput("diff2", width=fig.width3, height=fig.height3)),  
+                                  #          h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
+                                  # ),
                                   
-                                  tabPanel("3 Frequentist analysis", value=3, 
+                                  tabPanel("2 Estimating correlation simulated data", value=3, 
                                            h3("xxxxxxxxxxxxxxxx"),
                                            h4("xxxxxxxxxxxxxxxxx"),
                                            #   div( verbatimTextOutput("fisher")),
@@ -202,7 +209,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   ),
                                   
                                   
-                                  tabPanel("3 Ruben data", value=3, 
+                                  tabPanel("3 Estimating correlation Ruben data", value=3, 
                                            h3("xxxxxxxxxxxxxxxx"),
                                            h4("xxxxxxxxxxxxxxxxx"),
                                            #   div( verbatimTextOutput("fisher")),
@@ -346,7 +353,7 @@ server <- shinyServer(function(input, output   ) {
         par(bg = 'lightgoldenrodyellow') 
         par(mfrow=c(1,3))
         plot(density(z),
-             xlab="Freq. Bootstrap, Mean estimate",
+             xlab="Frequentist Bootstrap, Mean estimate",
              ylab="Density",
              main="",
              ylim=c(0,max(density(z)$y)),
