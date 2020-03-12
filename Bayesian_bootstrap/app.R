@@ -494,13 +494,20 @@ server <- shinyServer(function(input, output   ) {
         maxx <- max(all)
         b <- c(minx, maxx)
         
-        a <- x <- c(.01,0.05,0.1,0.2,0.4,0.6,0.8,0.9, 0.97, 0.99, 0.999,0.9999) #labels
+        a <- x <- c(.01,0.05,0.1,0.2,0.4,0.6,0.7,0.8,0.9, 0.97, 0.99, 0.999,0.9999) #labels
+        a <- x <- c(seq(0,0.98,0.02),.99,0.995,0.999, 0.9995,0.9999)#labels
         q <- qlogis(x)   
         
         lims <- unique(a[sapply(b,function(x) which.min(abs(x-a)))])
         
         indx <- which(x %in% lims)
-        limz <- x[indx[1]:indx[2]]
+        #limz <- x[indx[1]:indx[2]]
+         i = indx[1]-1
+         j= indx[2]+1
+         limitz = c(q[i], q[j])
+         breakz = q[i:j]
+         labelz = x[i:j]
+        
         
         
         require(ggplot2)
@@ -510,9 +517,9 @@ server <- shinyServer(function(input, output   ) {
         
         pL1<- ggplot(data = ff, aes(x = ff)) + x1+   
             geom_histogram(bins = 100, fill = rainbow(100))+
-            scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
-                               breaks= q[indx[1]:indx[2]],  # this is where the values go
-                               labels= x[indx[1]:indx[2]])   + 
+            scale_x_continuous(limits =limitz,
+                               breaks= breakz,  # this is where the values go
+                               labels= labelz)   + 
             labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL1 <- pL1 + theme(axis.line=element_blank(),
@@ -537,9 +544,9 @@ server <- shinyServer(function(input, output   ) {
         bb <- as.data.frame(bb)
         pL2<- ggplot(data = bb, aes(x = bb)) +x1 +
             geom_histogram(bins = 100, fill = rainbow(100))+
-          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
-                             breaks= q[indx[1]:indx[2]],  # this is where the values go
-                             labels= x[indx[1]:indx[2]])   + 
+          scale_x_continuous(limits =limitz,
+                             breaks= breakz,  # this is where the values go
+                             labels= labelz)   + 
             labs(title = paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL2 <- pL2 + theme(axis.line=element_blank(),
@@ -564,9 +571,9 @@ server <- shinyServer(function(input, output   ) {
         BBB<- as.data.frame(BBB)
         pL3<- ggplot(data = BBB, aes(x = BBB)) +x1+ 
             geom_histogram(bins = 100, fill = rainbow(100))+
-          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
-                             breaks= q[indx[1]:indx[2]],  # this is where the values go
-                             labels= x[indx[1]:indx[2]])   + 
+          scale_x_continuous(limits =limitz,
+                             breaks= breakz,  # this is where the values go
+                             labels= labelz)   + 
             labs(title = paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL3 <- pL3 + theme(axis.line=element_blank(),
@@ -593,9 +600,9 @@ server <- shinyServer(function(input, output   ) {
         xx<- as.data.frame(xx)
         pL4<- ggplot(data = xx, aes(x = xx)) +x1+ 
             geom_histogram(bins = 100, fill = rainbow(100))+
-          scale_x_continuous(limits =c(q[indx[1]], q[indx[2]]),
-                             breaks= q[indx[1]:indx[2]],  # this is where the values go
-                             labels= x[indx[1]:indx[2]])   + 
+          scale_x_continuous(limits =limitz,
+                             breaks= breakz,  # this is where the values go
+                             labels= labelz)   + 
             labs(title = paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL4 <- pL4 + theme(axis.line=element_blank(),
