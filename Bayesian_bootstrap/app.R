@@ -20,10 +20,14 @@ fig.width <- 400
 fig.height <- 300
 fig.width2 <- 1400
 fig.height2 <- 300#50
-fig.width3 <- 600  
+fig.width3 <- 1400  
 fig.height3 <- 600#400
 fig.width4 <- 1380
 fig.height4 <- 300
+
+fig.width5 <- 1380
+fig.height5 <- 600
+
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p2 <- function(x) {formatC(x, format="f", digits=2)}
 p3 <- function(x) {formatC(x, format="f", digits=3)}
@@ -85,10 +89,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                 div(h5("Enter the true mean and sd for normal dist.")), "10, 5"),
                                       
                                       textInput('n1y1', 
-                                                div(h5("Enter the number of samples")), "101"),
+                                                div(h5("Enter the number of samples")), "10"),
                                       
                                       textInput('n2y2', 
-                                                div(h5("Enter the true correlation")), ".9"),
+                                                div(h5("Enter the true correlation")), ".8"),
                                       
                                       textInput('sims', 
                                                 div(h5("Monte Carlo simulations")), "1000"),
@@ -193,7 +197,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            #   div( verbatimTextOutput("prop")),
                                            h4("Logistic regression odds ratio"), 
                                            #   div( verbatimTextOutput("logregx")),
-                                           
+                                           div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
                                            
                                   )
@@ -425,7 +429,7 @@ server <- shinyServer(function(input, output   ) {
         
         sample <- random.sample()
         
-        n    <- sample$n1  
+        n    <- sample$n1
         r    <- sample$n2
         reps <- sims <- sample$sims
         
@@ -492,18 +496,22 @@ server <- shinyServer(function(input, output   ) {
         all <- c(f,b,BB,xx1)
         minx <- min(all)
         maxx <- max(all)
-        b <- c(minx, maxx)
+        bz <- c(minx, maxx)
         
         a <- x <- c(.01,0.05,0.1,0.2,0.4,0.6,0.7,0.8,0.9, 0.97, 0.99, 0.999,0.9999) #labels
-        a <- x <- c(seq(0,0.98,0.02),.99,0.995,0.999, 0.9995,0.9999)#labels
+        a <- x <- c(-.95,-.98,-.99,-0.995,-0.999, -0.9995,-0.9999,  seq(-.9,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#labels
+
+        a <- x <- c(0.001, 0.003,0.01, 0.05,seq(.1,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#labels
+        
         q <- qlogis(x)   
         
-        lims <- unique(a[sapply(b,function(x) which.min(abs(x-a)))])
+        lims <- unique(a[sapply(bz,function(x) which.min(abs(x-a)))])
         
         indx <- which(x %in% lims)
         #limz <- x[indx[1]:indx[2]]
          i = indx[1]-1
-         j= indx[2]+1
+         if (i %in% 0) {i=1} 
+         j=  indx[2]+1
          limitz = c(q[i], q[j])
          breakz = q[i:j]
          labelz = x[i:j]
@@ -518,17 +526,20 @@ server <- shinyServer(function(input, output   ) {
         pL1<- ggplot(data = ff, aes(x = ff)) + x1+   
             geom_histogram(bins = 100, fill = rainbow(100))+
             scale_x_continuous(limits =limitz,
-                               breaks= breakz,  # this is where the values go
-                               labels= labelz)   + 
-            labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
+                                breaks= breakz,  # this is where the values go
+                                labels= labelz)   + 
+          
+          
+            labs(title = paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI ("
+                               , p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") ) +
             theme_bw()  
         pL1 <- pL1 + theme(axis.line=element_blank(),
                            #axis.text.x=element_blank(),
                            #axis.text.y=element_blank(),
                            #axis.ticks=element_blank(),
                            #axis.title.x=element_blank(),
-                           axis.text=element_text(size=8),
-                           axis.title=element_text(size=6,face="bold"),
+                           axis.text=element_text(size=14),
+                           axis.title=element_text(size=12,face="bold"),
                            #axis.title.y=element_blank(),
                            # legend.position="none",
                            panel.background=element_blank(),
@@ -537,7 +548,8 @@ server <- shinyServer(function(input, output   ) {
                            #panel.grid.minor=element_blank(),
                            # plot.background=element_blank())
                            #plot.margin = unit(c(1,1,1,1), "cm")
-                           plot.title = element_text(size = 8)
+                           plot.title = element_text(size = 14)
+                           
         )
         
         est <- quantile(b, c(.025,.5,.975))  
@@ -554,8 +566,8 @@ server <- shinyServer(function(input, output   ) {
                            #axis.text.y=element_blank(),
                            #axis.ticks=element_blank(),
                            #axis.title.x=element_blank(),
-                           axis.text=element_text(size=8),
-                           axis.title=element_text(size=6,face="bold"),
+                           axis.text=element_text(size=14),
+                           axis.title=element_text(size=12,face="bold"),
                            #axis.title.y=element_blank(),
                            # legend.position="none",
                            panel.background=element_blank(),
@@ -564,7 +576,7 @@ server <- shinyServer(function(input, output   ) {
                            #panel.grid.minor=element_blank(),
                            # plot.background=element_blank())
                            #plot.margin = unit(c(1,1,1,1), "cm")
-                           plot.title = element_text(size = 8)
+                           plot.title = element_text(size = 14)
         )
         
         est <- quantile(BB, c(.025,.5,.975))  
@@ -581,8 +593,8 @@ server <- shinyServer(function(input, output   ) {
                            #axis.text.y=element_blank(),
                            #axis.ticks=element_blank(),
                            #axis.title.x=element_blank(),
-                           axis.text=element_text(size=8),
-                           axis.title=element_text(size=6,face="bold"),
+                           axis.text=element_text(size=14),
+                           axis.title=element_text(size=12,face="bold"),
                            #axis.title.y=element_blank(),
                            # legend.position="none",
                            panel.background=element_blank(),
@@ -591,7 +603,7 @@ server <- shinyServer(function(input, output   ) {
                            #panel.grid.minor=element_blank(),
                            # plot.background=element_blank())
                            #plot.margin = unit(c(1,1,1,1), "cm")
-                           plot.title = element_text(size = 8)
+                           plot.title = element_text(size = 14)
         )
         
         
@@ -610,8 +622,8 @@ server <- shinyServer(function(input, output   ) {
                            #axis.text.y=element_blank(),
                            #axis.ticks=element_blank(),
                            #axis.title.x=element_blank(),
-                           axis.text=element_text(size=8),
-                           axis.title=element_text(size=6,face="bold"),
+                           axis.text=element_text(size=14),
+                           axis.title=element_text(size=12,face="bold"),
                            #axis.title.y=element_blank(),
                            # legend.position="none",
                            panel.background=element_blank(),
@@ -620,23 +632,154 @@ server <- shinyServer(function(input, output   ) {
                            #panel.grid.minor=element_blank(),
                            # plot.background=element_blank())
                            #plot.margin = unit(c(1,1,1,1), "cm")
-                           plot.title = element_text(size = 8)
+                           plot.title = element_text(size = 14)
         )
         
         
         
         
         
-        gridExtra::grid.arrange(pL1,  pL2, pL3,  pL4, nrow=4) 
+        gridExtra::grid.arrange(pL1,  pL2, pL3,  pL4, nrow=2) 
+        
+    })
+        
+        output$diff3 <- renderPlot({         
+          
+          f <- cor1()$f
+          b  <- cor1()$b
+          BB <-cor1()$BB
+          xx1 <- cor1()$xx1
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # new
+        # ff <- qlogis(f)
+        # bb <- qlogis(b)
+        # BBB <- qlogis(BB)
+        # xx <- qlogis(xx1)
+        # foo <- cbind(ff,bb,BBB,xx)
+        # foo1 <- reshape::melt(foo)
+        # 
+        # #all <- c(f,b,BB,xx1)
+        # #minx <- min(all)
+        # #maxx <- max(all)
+        # #bz <- c(minx, maxx)
+        # a<- x <- c(0.001, 0.003,0.01, 0.05,seq(.1,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9997,0.9999)#labels
+        # 
+        # q <- qlogis(x)   
+        # 
+        # bz <- c(min(a), max(a))
+        # 
+        # lims <- unique(a[sapply(bz,function(x) which.min(abs(x-a)))])
+        # 
+        # indx <- which(x %in% lims)
+        # #limz <- x[indx[1]:indx[2]]
+        # i = indx[1]-1
+        # if (i %in% 0) {i=1} 
+        # if (i > length(a)) {i=length(a)-1} 
+        # j=  indx[2]+1
+        # 
+        # 
+        # 
+        # limitz = c(q[i], q[j])
+        # breakz = q[i:j]
+        # labelz = x[i:j]
+        # 
+        # ggplot(data=foo1, aes(x = value)) +#
+        #   geom_histogram( bins=100, colour="blue", fill="blue")+
+        #   facet_grid(X2~ .)  +
+        # scale_x_continuous(limits =limitz,
+        #                    breaks= breakz,  # this is where the values go
+        #                    labels= labelz)   
+        
+         
+      #~~~~~~~~~~~~~~~~~~~~~~~promising############################################################
+        ff <-  (f)
+        bb <- (b)
+        BBB <- (BB)
+        xx <- (xx1)
+        foo <- cbind(ff,bb,BBB,xx)
+        foo1 <- reshape::melt(foo)
+        
+     #  p <- c(0.001, 0.003,0.01, 0.05,seq(.2,0.9,0.2),.9,.95,.98,.99,0.995,0.998,0.999, 0.9995,0.9998,0.9999)#l
+      #  require(scales)
+        # ggplot(data=foo1, aes(x = value)) +#
+        #   geom_histogram( bins=100, colour="blue", fill="blue")+
+        #   facet_grid(X2~ .)  +
+        #   scale_x_continuous(trans = logit_trans(),
+        # breaks= p) 
+        # 
+        # 
+        
+        #p <- c(0.001, 0.003,0.01, 0.05,seq(.2,0.9,0.2),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#l
+       # require(scales)
+        #ggplot(data=foo1, aes(x = value)) +#
+         # geom_histogram( bins=100, colour="blue", fill="blue")+
+          #facet_grid(X2~ .)  +
+          #scale_x_continuous(trans = logit_trans()  ,
+           #                  breaks= p)
+        
+        levels(foo1$X2)
+        
+        est <- quantile(f, c(.025,.5,.975)) 
+      C <-  paste("Frequentist bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+
+        est <- quantile(b, c(.025,.5,.975))  
+      A <-  paste("Bayesian bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+
+        est <- quantile(BB, c(.025,.5,.975))  
+      B <-  paste("LaplaceDemon bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+
+        est <- quantile(xx1, c(.025,.5,.975))  
+     D <-   paste("bayesboot bootstrap: Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+
+
         
         
+         
+         levels(foo1$X2) <- c(paste("Bayesian Bootstrap",A),
+                              paste("LaplaceDemon",B),
+                              paste("Frequentist",C),
+                              paste("Bayesboot",D)
+                              )
+         
+        p <- c(-.9, -.5,0.01, 0.05, seq(.2,0.8,0.4),.9,.99,0.999,   0.9999)#l
+        # require(scales)
+        # ggplot(data=foo1, aes(x = value)) +#
+        #   geom_histogram( bins=100, colour="blue", fill=rainbow(400))+
+        #   facet_wrap(X2~ .)  +
+        #   scale_x_continuous(trans = logit_trans()  ,
+        #                      breaks= p, 
+        #                      limits=c(-.9,.9999))
+        # 
         
+        p <- c(-.9, .9,-.99,.99 , -.95, .95,seq(-.8,.8,0.2))  
         
+        library(scales)
+       g0 <- ggplot(data=foo1, aes(x = value)) +#
+          geom_histogram( bins=100, colour="blue")+  #, fill=rainbow(400)
+          facet_wrap(X2~ .) 
+       
         
+    #   g0 +   scale_x_continuous(trans = atanh_trans()  ,
+     ##                        breaks= p, 
+       #                      limits=c(-.99,.99))
+   
+       g0  + scale_x_continuous(trans = atanh_trans()  ,
+                               breaks= p, 
+                              limits=c(-.99,.99),oob=censor)
         
+         
+        #g0  + scale_x_continuous(trans = atanh_trans()  ,
+         #                       breaks= p, 
+          #                     limits=c(-.99,.99),oob=squish)
+          
+       #not bad
+ #       g0  + scale_x_continuous(trans = atanh_trans()  ,
+  #                               breaks= p, 
+   #                              limits=c(-.99,.99),oob=discard)
+        ## really wacky, but perhaps useful sometimes
+      
         
-        
-        
+        print(g0)
         
         
     })
