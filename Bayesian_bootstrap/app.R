@@ -4,17 +4,22 @@
 rm(list=ls())
 library(ggplot2)
 library(shiny) 
-require(LearnBayes)
-library(tidyverse)
+#require(LearnBayes)
+#library(tidyverse)
 library(shinyWidgets)
 library(shinythemes)  # more funky looking apps
-library(rstan)
+#library(rstan)
 library(DT)
-require(rms) # freq logistic regression
+#require(rms) # freq logistic regression
 library(shinyalert)
-
-options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
+library(gtools)
+library(Hmisc)
+library(scales)
+library(LaplacesDemon)
+library(bayesboot)
+library(boot)
+ #options(mc.cores = parallel::detectCores())
+#rstan_options(auto_write = TRUE)
 options(max.print=1000000)
 fig.width <- 400
 fig.height <- 300
@@ -118,8 +123,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       div(p(" ")),
                                       # tags$a(href = "https://www.tjmahr.com/bayesian-fisher-exact-test/", "[4] Blog article"),
                                       # div(p(" ")),
-                                      
-                                      
+
                                   )
                                   
                     ),
@@ -146,11 +150,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
                    ")),
                                   
-                              
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("1 Estimating a one sample mean", value=7, 
                                            
-                                          
                                                     h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size and 
                                                     the true population mean and standard deviation. We present from the left, the familiar frequentist bootstrap approach. 
                                                     With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
@@ -251,8 +253,6 @@ server <- shinyServer(function(input, output   ) {
         )) 
         
     })
-    
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # tab 1 one sample mean estimation
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,7 +268,7 @@ server <- shinyServer(function(input, output   ) {
         
         x <- rnorm(n, mean=mu1, sd=sd1)
           
-        require(Hmisc)
+        #require(Hmisc)
         dboot <- function(data.set) {
             u <- c(0, sort(runif(length(data.set) - 1)), 1)
             g <- diff(u)
@@ -277,7 +277,7 @@ server <- shinyServer(function(input, output   ) {
         }
         
         #http://rsnippets.blogspot.ie/2012/11/simple-bayesian-bootstrap.html
-        library(gtools)
+       # library(gtools)
         
         # Bayesian bootstrap
         mean.bb <- function(x, n) {
@@ -363,7 +363,7 @@ server <- shinyServer(function(input, output   ) {
        r <-  mu1+5* sd1
        p <-  seq(-r, r, sd1/n) #(r--r)/10)
       
-      library(scales)
+       #library(scales)
       g0 <- ggplot(data=foo1, aes(x = value)) +#
         geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
         geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -411,15 +411,10 @@ server <- shinyServer(function(input, output   ) {
                       caption = "The dotted lines indicate the median and 2.5 and 97.5 percentiles, the red line is the true population mean" 
         ) 
       
-      
-      
       print(g0)
-      
-         
-    })
 
-    
-    
+    })
+  
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # not used replaced by diff, ggplot 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -521,13 +516,13 @@ server <- shinyServer(function(input, output   ) {
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         X <- matrix(c(z[,1],z[,2]), length(z[,1]), 2)
-        library(LaplacesDemon)
+        #library(LaplacesDemon)
         BB <- BayesianBootstrap(X=X, n=sims,
                                 Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        library(bayesboot)
+        #library(bayesboot)
         # Using the weighted correlation (corr) from the boot package.
-        library(boot)
+        #library(boot)
         b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
@@ -760,7 +755,7 @@ server <- shinyServer(function(input, output   ) {
          
         p <- sort(c(-.9, .9,-.99,.99 ,.999,.9999,1,-.95, .95,.8,-.8,seq(-.6,.6,0.3))  )
         
-        library(scales)
+       # library(scales)
        g0 <- ggplot(data=foo1, aes(x = value)) +#
           geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
           geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -820,13 +815,12 @@ server <- shinyServer(function(input, output   ) {
           return(list(data.set=data.set)) 
 
         })
-        #
+
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       # ruben's data analysis correlation plot tab 3
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
         output$diff4 <- renderPlot({      
-          
           
           sample <- random.sample()
           
@@ -834,7 +828,7 @@ server <- shinyServer(function(input, output   ) {
           
           reps <- sims <- sample$sims
           
-          library(LaplacesDemon)
+         # library(LaplacesDemon)
           len <- length(data.set$dye)
           
             sboot <- function() {
@@ -853,9 +847,9 @@ server <- shinyServer(function(input, output   ) {
           BB <- BayesianBootstrap(X=X, n=sims,
                                   Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
            
-          library(bayesboot)
+         # library(bayesboot)
           # Using the weighted correlation (corr) from the boot package.
-          library(boot)
+        #  library(boot)
           b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
            
           
@@ -897,7 +891,6 @@ server <- shinyServer(function(input, output   ) {
           q3 =  c(Ae[3], Be[3], Ce[3], De[3])
           )
           
-          
           levels(foo1$X2) <- c(paste("",A),
                                paste("",B),
                                paste("",C),
@@ -905,7 +898,7 @@ server <- shinyServer(function(input, output   ) {
           )
           
           p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
-          library(scales)
+          #library(scales)
           g0 <- ggplot(data=foo1, aes(x = value)) +#
             geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
             geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
