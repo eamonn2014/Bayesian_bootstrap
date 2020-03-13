@@ -832,12 +832,10 @@ server <- shinyServer(function(input, output   ) {
           
           data.set <- ruben()$data.set
           
-    
           reps <- sims <- sample$sims
           
-          
           library(LaplacesDemon)
-          len <- length(dye)
+          len <- length(data.set$dye)
           
             sboot <- function() {
               cor(data.set[sample(1:len, replace=T),])[1,2]
@@ -847,13 +845,15 @@ server <- shinyServer(function(input, output   ) {
               cov.wt(data.set, diff(c(0,sort(runif(len-1)),1)), cor=T)$cor[1,2]
             }
             
+           A <- data.set$dye
+           B <- data.set$efp
             
-            X <- matrix(c(dye,efp), len, 2)
+          X <- matrix(c(A, B), len, 2)
           colnames(X) <- c("dye","efp")
           BB <- BayesianBootstrap(X=X, n=sims,
                                   Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
            
-            library(bayesboot)
+          library(bayesboot)
           # Using the weighted correlation (corr) from the boot package.
           library(boot)
           b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
