@@ -49,12 +49,16 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                     direction = "bottom"
                 ),
                 
-                h2("The Bayesian Bootstrap"),
+                h2("The Bayesian Bootstrap (philosophic numbers smooth)"),
                 
-                h4("There is a Bayesian analogue of the familiar frequentist bootstrap [1]. We investigate using a coded up function and two
-                functions from R packages. We also run a frequentist bootstrap. We look at estimating a mean from a normal distribution and 
-                correlation coefficient between two groups of samples. In the case of the mean, n-1 uniform samples are drawn and the n gaps then become 
-                the probabilities for incorporation in the boostrap sample [2]. We also use a published dataset to estimate correlation [1].
+                h4("There is a Bayesian analogue of the familiar frequentist bootstrap! [1]. We investigate the Bayesian bootstrap using functions coded up by me and 
+                functions from R packages. We also run a frequentist bootstrap. We look at (i) estimating a mean from one sample from a normal distribution and 
+                (ii) estimating a correlation coefficient between two groups of samples. In the case of the one sample mean, n-1 uniform samples are drawn and the size of the n gaps then become 
+                the probabilities for incorporation of the original n samples into the boostrap sample [2]. On the third tabWe also use a published dataset to estimate correlation [1]. 
+                An observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with respect to the resulting 
+                inferences about parameters is that 
+                the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters.
+
               "), 
                 
                 h3("  "), 
@@ -68,16 +72,16 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   
                                   
                                   actionButton(inputId='ab1', label="R code",   icon = icon("th"),   
-                                               onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Bayesian-proportions-logistic-regression/master/monte-carlo-two-proportions/app.R', '_blank')"),    
-                                  actionButton("resample", "Rerun the Monte Carlo simulations"),
+                                               onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/Bayesian_bootstrap/app.R', '_blank')"),    
+                                  actionButton("resample", "Rerun the Monte Carlo simulation"),
                                   br(), # br(), 
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
-                                  h4("The first input is the number of Monte Carlo simulations and impacts tabs 1 to 3. 
+                                  h4("The first input below is the number of Monte Carlo simulations which impacts tabs 1 to 3. 
                                   The next two inputs impact only tab 1, the number of samples and
                                      the true mean and standard deviation. Tab 2 estimates the uncertainty in a correlation 
                                      coefficient and the last two inputs, the number of samples (in each of two groups) and the true correlation between
-                                     the two groups come into play here."),
+                                     the two groups come into play here. The fouth tab presents the published data."),
                                   div(
                                       
                                       tags$head(
@@ -87,22 +91,22 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       tags$head(
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
-                                      h4("------------------------------------All tabs------------------------------------"),
+                                     # h4("------------------------------------All tabs------------------------------------"),
                                       textInput('sims', 
-                                                div(h5("Monte Carlo simulations")), "1000"),
-                                      h4("------------------------------------tab 2 inputs------------------------------"),
+                                                div(h5("Monte Carlo simulations (all tabs)")), "1000"),
+                                      #h4("------------------------------------tab 2 inputs only-------------------------"),
                                       textInput('vec3', 
-                                                div(h5("Number of samples for mean")), "100"),
+                                                div(h5("Number of samples for mean (tab 1)")), "100"),
                                       
                                       textInput('vec4', 
-                                                div(h5("Enter the true mean and sd for a normal distribution.")), "10, 5"),
-                                      h4("------------------------------------tab 3 inputs------------------------------"),
+                                                div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
+                                      #h4("------------------------------------tab 3 inputs only-------------------------"),
                                       textInput('n1y1', 
-                                                div(h5("Number of samples for Correlation")), "10"),
+                                                div(h5("Number of samples for Correlation (tab 2)")), "10"),
                                       
                                       textInput('n2y2', 
-                                                div(h5("Enter the true correlation")), ".8"),
-                                      h4("-----------------------------------------------------------------------------------"),
+                                                div(h5("Enter the true correlation (tab 2)")), ".8"),
+                                      #h4("-----------------------------------------------------------------------------------"),
                                  
                                       div(h5("References:")),  
                                       
@@ -143,65 +147,55 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                    ")),
                                   
                               
-                                  
+                                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("1 Estimating a one sample mean", value=7, 
                                            
                                           
-                                                    h4("Using the the inputs we can control the number of Monte Carlo simulations, the sample size and 
-                                                    the true population mean. We present from the left, the familiar frequentist approach. 
+                                                    h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size and 
+                                                    the true population mean and standard deviation. We present from the left, the familiar frequentist bootstrap approach. 
                                                     With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
-                                              and the n gap sizes are then the probability for inclusion in a bootstrap sample, of which the mean is then estimated. 
+                                              and the n gap sizes are then the probability for inclusion of the original samples into a bootstrap sample, the mean is then estimated. 
                                               The next Bayesian bootstrap distribution is generated using the dirichlet distribution with n draws from this distribution
                                               (the gaps between uniform random variables follow the dirichlet distribution) to derive the probability of inclusion.
                                                The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
-                                           h4(paste("Figure 1 Bayesian and frequentist distributions, estimating one sample mean")), 
+                                           h4(paste("Figure 1. Bayesian and frequentist distributions, estimating one sample mean")), 
                                            div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
-                                           
-                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
-                                           
-                                           
-                                           
-                                           
+                                            
                                            fluidRow(
                                                column(width = 5, offset = 0, style='padding:1px;',
-                                                      h4("Summaries of distributions, median and 95% intervals plus T-test estimates"), 
+                                                      h4("T-test mean and 95% confidence interval"), 
                                                       div( verbatimTextOutput("reg.summary2"))
                                                )),
                                    ) ,
                         
-                                  
+                                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("2 Estimating correlation using simulated data", value=3, 
-                h4("Using the the inputs we can control the number of Monte carlo simulations, the sample size and the true population correlation.
+                h4("Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
                We present clockwise from top left, 
-                                              an Bayesian bootstrap approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
+                                              a Bayesian bootstrap approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
                                               and the
-                                              n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
+                                              n gap sizes are then the probability for inclusion in a bootstrap sample, for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
                     We use the Fisher z transformation to plot each distribution. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
-                h4(paste("Figure 2 Bayesian and frequentist distributions, estimating correlation")), 
+                h4(paste("Figure 2. Bayesian and frequentist distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
                                   ),
-                                  
-                                  
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("3 Estimating correlation using Efron's dataset", value=3, 
                                            h4("We use the dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
                                               of 9 samples [1]. Figure 1 in the paper is very similar to the frequentist histogram here.
-                                              We use the Fisher z transformation to plot each distribution. The only user input that has
+                                              We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
                                               an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 and the
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
                                                   The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
-                                           h4(paste("Figure 3 Bayesian and frequentist distributions, estimating correlation")),  
+                                           h4(paste("Figure 3. Bayesian and frequentist distributions, estimating correlation")),  
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
                                            
                                   ),
-                                  
-                 
-                
-                
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 tabPanel("4 Efron's dataset", value=3, 
                          h4("Efron's dataset."),
@@ -210,42 +204,28 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                            column(
                          DT::dataTableOutput("tablex"),width = 6)
                          )
-                         
-                         
-                      
-                         
-                         
-                ) 
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~             
+                           ) 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                              )
-                              #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        )
+                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     )
-                    
-                ) 
+                 ) 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end tab panels 
                 
 )
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 server <- shinyServer(function(input, output   ) {
     
     shinyalert("You better believe it, there's a Bayesian bootstrap!",
                "And It's pretty, pretty good",
                type = "info")
-    # --------------------------------------------------------------------------
-    # ---------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # This is where a new sample is instigated 
+  
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # This is where a new sample is instigated 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     random.sample <- reactive({
         
         foo <- input$resample
@@ -262,17 +242,20 @@ server <- shinyServer(function(input, output   ) {
         
         sims <- as.numeric(unlist(strsplit(input$sims,",")))
         
-        return(list( #prob1=i[1],prob2=j[1],prob3=i[2],prob4=j[2],prob5=i[3],prob6=j[3],
+        return(list(  
             trt.alpha=trt[1],  
             ctr.alpha=ctr[1], ctr.beta=ctr[2],
             n1=n1y1[1], 
-            n2=n2y2[1],#y2=n2y2[2],
-            sims=sims#, prio=prio
+            n2=n2y2[1], 
+            sims=sims 
         )) 
         
     })
     
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # tab 1 one sample mean estimation
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     mcmc <- reactive({
         
         sample <- random.sample()
@@ -280,16 +263,11 @@ server <- shinyServer(function(input, output   ) {
         n   <- trt.alpha <- sample$trt.alpha
         mu1 <- sample$ctr.alpha
         sd1 <- sample$ctr.beta
-        
-        #n1   <- sample$n1  
-        # r    <- sample$n2
+ 
         reps <- sims <- sample$sims
         
         x <- rnorm(n, mean=mu1, sd=sd1)
-        #reps <- 10
-        
-        # simulations
-        
+          
         require(Hmisc)
         dboot <- function(data.set) {
             u <- c(0, sort(runif(length(data.set) - 1)), 1)
@@ -311,8 +289,6 @@ server <- shinyServer(function(input, output   ) {
             replicate(n, mean(sample(x, length(x), TRUE)))
         }
         
-      
-        
         fbq<-bbq<-bb2<-NULL
         
         system.time(A <- mean.fb(x, reps))
@@ -332,30 +308,30 @@ server <- shinyServer(function(input, output   ) {
         res <- rbind(A1,B1,C1,D1)
         rownames(res) <- NULL
         
+        res <- res[4,]
+        
         return(list(res=res , A=A, B=B, C=C , mu1=mu1)) 
         
     })
     
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # tab 1 one sample mean ggplot
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$diff <- renderPlot({         
-        ###############################################################
-      
-      
+
       sample <- random.sample()
       mu1 <- sample$ctr.alpha
       sd1 <- sample$ctr.beta
       n    <- sample$n1
-      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+ 
       A <- mcmc()$A
       B <- mcmc()$B
       C <- mcmc()$C
       
       foo <- cbind(A,B,C)
       foo1 <- reshape::melt(foo)
-      
-      
+
       levels(foo1$X2)
       
       Ae <-  est <- quantile(A, c(.025,.5,.975)) 
@@ -367,9 +343,7 @@ server <- shinyServer(function(input, output   ) {
       Ce<-  est <- quantile(C, c(.025,.5,.975))  
       C <-  paste("Bayesian2 : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
       
-    
-      
-      #make a dataset to add lines to ggplot facets
+        #make a dataset to add lines to ggplot facets
       
       dummy2 <- data.frame(X2=c(paste("",A),
                                 paste("",B),
@@ -434,7 +408,7 @@ server <- shinyServer(function(input, output   ) {
       
       g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
                       #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
-                      #caption = "Source: the Lahman baseball database" 
+                      caption = "The dotted lines indicate the median and 2.5 and 97.5 percentiles, the red line is the true population mean" 
         ) 
       
       
@@ -443,8 +417,13 @@ server <- shinyServer(function(input, output   ) {
       
          
     })
+
     
-   ### not used replaced by diff 
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # not used replaced by diff, ggplot 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     output$diffx <- renderPlot({         
       
       z <- mcmc()$A
@@ -496,17 +475,12 @@ server <- shinyServer(function(input, output   ) {
       abline(v=mu1, col="black", lty='dashed')
       
       captio=("xxxx")
-      
-      
-      
+     
       par(mfrow=c(1,1))
       
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$reg.summary2 <- renderPrint({
@@ -514,7 +488,10 @@ server <- shinyServer(function(input, output   ) {
         return(print(mcmc()$res, digits=4))
         
     })
-    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # run the correlation analysis for tab 2
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     cor1 <- reactive({
         
         sample <- random.sample()
@@ -563,10 +540,9 @@ server <- shinyServer(function(input, output   ) {
         
     })
 
-    
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #NOT USED REPLACED BY FACET PLOT
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$diff2 <- renderPlot({         
     
@@ -581,17 +557,13 @@ server <- shinyServer(function(input, output   ) {
         BBB <- qlogis(BB)
         xx <- qlogis(xx1)
         
-        
-        
         all <- c(f,b,BB,xx1)
         minx <- min(all)
         maxx <- max(all)
         bz <- c(minx, maxx)
-        
-        a <- x <- c(.01,0.05,0.1,0.2,0.4,0.6,0.7,0.8,0.9, 0.97, 0.99, 0.999,0.9999) #labels
-        a <- x <- c(-.95,-.98,-.99,-0.995,-0.999, -0.9995,-0.9999,  seq(-.9,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#labels
+         
 
-        a <- x <- c(0.001, 0.003,0.01, 0.05,seq(.1,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9999)#labels
+        a <- x <- c(0.001, 0.003,0.01, 0.05,seq(.1,0.9,0.1),.95,.98,.99,0.995,0.999, 0.9995,0.9999) 
         
         q <- qlogis(x)   
         
@@ -605,8 +577,6 @@ server <- shinyServer(function(input, output   ) {
          limitz = c(q[i], q[j])
          breakz = q[i:j]
          labelz = x[i:j]
-        
-        
         
         require(ggplot2)
         x1 <- xlab("")
@@ -733,7 +703,10 @@ server <- shinyServer(function(input, output   ) {
         
     })
         
-        output$diff3 <- renderPlot({         
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # correlation plot tab 2
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$diff3 <- renderPlot({         
           
           f <- cor1()$f
           b  <- cor1()$b
@@ -743,9 +716,7 @@ server <- shinyServer(function(input, output   ) {
           sample <- random.sample()
        
           r    <- sample$n2
-       #   n    <- sample$n1
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
+
         ff <-  (f)
         bb <- (b)
         BBB <- (BB)
@@ -765,10 +736,10 @@ server <- shinyServer(function(input, output   ) {
       Be<-  est <- quantile(BB, c(.025,.5,.975))  
       B <-  paste("LaplaceDemon : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
 
-    De<-    est <- quantile(xx1, c(.025,.5,.975))  
+     De<-    est <- quantile(xx1, c(.025,.5,.975))  
      D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
 
-#make a dataset to add lines to ggplot facets
+     # make a dataset to add lines to ggplot facets
      
      dummy2 <- data.frame(X2=c(paste("",A),
                             paste("",B),
@@ -835,30 +806,25 @@ server <- shinyServer(function(input, output   ) {
                        )
         print(g0)
         
-        
-        
-        
-        
-        
-                       
-        
     })
-        
-        ruben <- reactive({
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # ruben's data
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+      ruben <- reactive({
           
-        
           dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
           efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
           data.set <- data.frame(dye,efp)
           
           return(list(data.set=data.set)) 
-  
-        
+
         })
         #
-        #################################################################
-        # rubens data
-        
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # ruben's data analysis correlation plot tab 3
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
         output$diff4 <- renderPlot({      
           
           
@@ -871,10 +837,6 @@ server <- shinyServer(function(input, output   ) {
           
           
           library(LaplacesDemon)
-          # dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
-          # efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
-          # data.set <- data.frame(dye,efp)
-         
           len <- length(dye)
           
             sboot <- function() {
@@ -895,26 +857,19 @@ server <- shinyServer(function(input, output   ) {
           # Using the weighted correlation (corr) from the boot package.
           library(boot)
           b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
-          
-          
-          #   x <- c(.3,.4,0.6,.8,.9, .96, .99, .999,.9999,.99995) #labels
-          # q <- qlogis(x)                                       #plot at these points
+           
           
           f<-replicate(sims, sboot())
           b<-replicate(sims, bboot())
           BB <- unlist(BB)
           xx1 <- b4$V1
-          
-          #   n    <- sample$n1
-          #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          
+            
           ff <-  (f)
           bb <- (b)
           BBB <- (BB)
           xx <- (xx1)
           foo <- cbind(ff,bb,BBB,xx)
           foo1 <- reshape::melt(foo)
-          
           
           levels(foo1$X2)
           
@@ -930,7 +885,7 @@ server <- shinyServer(function(input, output   ) {
           De<-    est <- quantile(xx1, c(.025,.5,.975))  
           D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
           
-          #make a dataset to add lines to ggplot facets
+          # make a dataset to add lines to ggplot facets
           
           dummy2 <- data.frame(X2=c(paste("",A),
                                     paste("",B),
@@ -949,7 +904,6 @@ server <- shinyServer(function(input, output   ) {
                                paste("",D)
           )
           
-          p <- c(-.9, .9,-.99,.99 ,.995,.999, .9999, -.95, .95,seq(-.8,.8,0.2))  
           p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
           library(scales)
           g0 <- ggplot(data=foo1, aes(x = value)) +#
@@ -997,11 +951,11 @@ server <- shinyServer(function(input, output   ) {
           
         })
         
-        
-        
-        
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    output$tablex <- DT::renderDataTable({
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # print Ruben's data
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+       output$tablex <- DT::renderDataTable({
         
         d <- ruben()$data.set
      
@@ -1029,99 +983,8 @@ server <- shinyServer(function(input, output   ) {
         
     })
     
-    # --------------------------------------------------------------------------
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    fisher <- reactive({
-        
-        # sample <- random.sample()
-        # 
-        # n1 <- sample$n1  
-        # y1 <- sample$y1
-        # n2 <- sample$n2
-        # y2 <- sample$y2
-        # 
-        # n1 <- 50
-        # y1 <- 15
-        # n2 <- 50
-        # y2 <- 10
-        # 
-        # 
-        # #~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # data <- matrix(c(y1, n1-y1,y2,n2-y2),nr=2,dimnames=list(c("response","nonresponse"), c("trt","ctrl")))
-        # f <- fisher.test(data)
-        # 
-        # #~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # res <- prop.test(x = c(y1, y2), n = c(n1, n2), correct = FALSE)
-        # pr <- res 
-        # 
-        # #~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # # # logistic regression
-        # 
-        # Table <- t( matrix(c(y1,y2,n1-y1,n2-y2), nc=2))
-        # f99 <- glm(as.table(Table) ~ c(1,0), family=binomial)
-        # f100 <- exp(coef(f99))[2][[1]]
-        # 
-        # #~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # 
-        # d = as.data.frame(as.table(as.matrix(data)))
-        # 
-        # # from stack exchange
-        # countsToCases <- function(x, countcol = "Freq") {
-        #     # Get the row indices to pull from x
-        #     idx <- rep.int(seq_len(nrow(x)), x[[countcol]])
-        #     # Drop count column
-        #     x[[countcol]] <- NULL
-        #     # Get the rows from x
-        #     x[idx, ]
-        # }
-        # 
-        # 
-        # dd <- countsToCases(d)
-        # rownames(dd)<-NULL
-        # 
-        # 
-        # dd$y <- ifelse(dd$Var1 %in% "response",1,0)
-        # dd$x <- ifelse(dd$Var2 %in% "trt",1,0)
-        # dd$Var1 <- dd$Var2 <- NULL
-        # 
-        # #y <- dd$y; x <- dd$x
-        # # summary(glm(y ~ x, family=binomial))
-        # 
-        # ddd <<- datadist(dd)
-        # options( datadist = "ddd" )
-        # harrell <- summary(lrm(y~x,dd))
-        # 
-        # 
-        # #~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # return(list(f= f, pr=pr , logreg = harrell  ))   #, logreg = f99
-        
-    })
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    # output$fisher <- renderPrint({
-    #     
-    #     return(print(fisher()$f, digits=4))
-    #     
-    # })
-    # output$prop <- renderPrint({
-    #     
-    #     return(print(fisher()$pr, digits=4))
-    #     
-    # })
-    # 
-    # output$logregx <- renderPrint({
-    #     
-    #     return(print(fisher()$logreg, digits=4))
-    #     
-    # })
-    #~~~~~~~~~~~~~~
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # ---------------------------------------------------------------------------
-    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 })
 
