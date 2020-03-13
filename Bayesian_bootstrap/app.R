@@ -53,7 +53,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h4("There is a Bayesian analogue of the familiar frequentist bootstrap. We investigate using a coded up function and two
                 functions from R packages. We also run a frequentist bootstrap. We look at estimating a mean from a normal distribution and 
-                corellation coefficient between two samples. In the case of the mean n-1 unifrom samples are drawn and the n gaps then become 
+                corellation coefficient between two samples. In the case of the mean n-1 uniform samples are drawn and the n gaps then become 
                 the probabilities for incorporation in the boostrap sample [1]. We also use a published dataset to estimate correlation.
               "), 
                 
@@ -73,10 +73,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   br(), # br(), 
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
-                                  h4("The first input is the number of Monte Carlo simulations. The next two inputs are the number of samples and
-                                     the true mean and standard deviation. The next experiment is estimating the uncertainty in a correlation 
-                                     coefficient. So we enter the the number of samples (in each of two groups) and then the true correlation between
-                                     the two groups."),
+                                  h4("The first input is the number of Monte Carlo simulations and impacts tabs 1 to 3. 
+                                  The next two inputs impact only tab 1, the number of samples and
+                                     the true mean and standard deviation. Tab 2 estimates the uncertainty in a correlation 
+                                     coefficient and the last two inputs, the number of samples (in each of two groups) and the true correlation between
+                                     the two groups come into play here."),
                                   div(
                                       
                                       tags$head(
@@ -86,22 +87,22 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       tags$head(
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
-                                      
+                                      h4("------------------------------------All tabs------------------------------------"),
                                       textInput('sims', 
-                                                div(h5("Monte Carlo simulations")), "10000"),
-                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+                                                div(h5("Monte Carlo simulations")), "1000"),
+                                      h4("------------------------------------tab 2 inputs------------------------------"),
                                       textInput('vec3', 
                                                 div(h5("Number of samples for mean")), "100"),
                                       
                                       textInput('vec4', 
                                                 div(h5("Enter the true mean and sd for a normal distribution.")), "10, 5"),
-                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+                                      h4("------------------------------------tab 3 inputs------------------------------"),
                                       textInput('n1y1', 
                                                 div(h5("Number of samples for Correlation")), "10"),
                                       
                                       textInput('n2y2', 
                                                 div(h5("Enter the true correlation")), ".8"),
-                                      h4("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+                                      h4("-----------------------------------------------------------------------------------"),
                                  
                                       div(h5("References:")),  
                                       
@@ -164,7 +165,20 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   
                                   tabPanel("1 Estimating a one sample mean", value=7, 
                                            
-                                           
+                                          
+                                                    h4("Using the the inputs we can control the number of Monte Carlo simulations, the sample size and 
+                                                    the true population mean.
+               We present from the left, the familiar frequentist approach. With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
+                                              and the
+                                              n gap sizes are then the probability for inclusion in a bootstrap sample, of which the mean is then estimated.
+               
+               
+               The next Bayesian bootstrap distribution is generated using the dirichlet distribution with n draws from this distribution
+               (the gaps between uniform random variables follow 
+               the dirichlet distribution) to derive the probability of inclusion.
+              
+                   The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                                                    
                                            fluidRow(
                                                column(width = 5, offset = 0, style='padding:1px;',
                                                       
@@ -195,9 +209,41 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   #          h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
                                   # ),
                                   
-                                  tabPanel("2 Estimating correlation simulated data", value=3, 
-                                           h3("xxxxxxxxxxxxxxxx"),
-                                           h4("xxxxxxxxxxxxxxxxx"),
+                                  tabPanel("2 Estimating correlation using simulated data", value=3, 
+                h4("Using the the inputs we can control the number of Monte carlo simulations, the sample size and the true population correlation.
+               We present clockwise from top left, 
+                                              an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
+                                              and the
+                                              n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
+                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
+                    We use the Fisher z transformation to plot each distribution. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                
+                # require(Hmisc)
+                # dboot <- function(data.set) {
+                #   u <- c(0, sort(runif(length(data.set) - 1)), 1)
+                #   g <- diff(u)
+                #   #return( wtd.quantile(data.set, weights=g, probs=.5, normwt=T))
+                #   return( wtd.mean(data.set, weights=g))
+                # }
+                # 
+                # #http://rsnippets.blogspot.ie/2012/11/simple-bayesian-bootstrap.html
+                # library(gtools)
+                # 
+                # # Bayesian bootstrap
+                # mean.bb <- function(x, n) {
+                #   apply(rdirichlet(n, rep(1, length(x))), 1, weighted.mean, x = x)
+                # }
+                # 
+                # # standard bootstrap
+                # mean.fb <- function(x, n) {
+                #   replicate(n, mean(sample(x, length(x), TRUE)))
+                # }
+                
+                
+                
+                
+                
+                                          # h4("xxxxxxxxxxxxxxxxx"),
                                            #   div( verbatimTextOutput("fisher")),
                                            #h4("2-sample test for equality of proportions without continuity correction"), 
                                            #   div( verbatimTextOutput("prop")),
@@ -209,9 +255,16 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   ),
                                   
                                   
-                                  tabPanel("3 Estimating correlation Ruben data", value=3, 
-                                           h3("xxxxxxxxxxxxxxxx"),
-                                           h4("xxxxxxxxxxxxxxxxx"),
+                                  tabPanel("3 Estimating correlation using a published dataset", value=3, 
+                                           h4("We use the dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
+                                              of 9 samples [1]. Figure 1 in the paper is very similar to the frequentist histogram here.
+                                              We use the Fisher z transformation to plot each distribution. The only user input that has
+                                              impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
+                                              an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 and the
+                                              n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
+                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
+                                                  The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                                           #h4("xxxxxxxxxxxxxxxxx"),
                                            #   div( verbatimTextOutput("fisher")),
                                            #h4("2-sample test for equality of proportions without continuity correction"), 
                                            #   div( verbatimTextOutput("prop")),
@@ -716,7 +769,7 @@ server <- shinyServer(function(input, output   ) {
                               paste("",D)
                               )
          
-        p <- c(-.9, .9,-.99,.99 , -.95, .95,.8,-.8,seq(-.6,.6,0.3))  
+        p <- sort(c(-.9, .9,-.99,.99 ,.999,.9999,1,-.95, .95,.8,-.8,seq(-.6,.6,0.3))  )
         
         library(scales)
        g0 <- ggplot(data=foo1, aes(x = value)) +#
@@ -728,13 +781,15 @@ server <- shinyServer(function(input, output   ) {
        
    
           g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
-                                        breaks= p, xlab("Correlation"),
+                                        breaks= p, 
+                                        xlab("Correlation"),
                                         oob=discard) +
+            #xlim(-Inf,Inf) +
             scale_y_continuous(breaks = NULL) +
 
       theme_bw()  
    
-      g0 <- g0 + theme(axis.line=element_blank(),
+      g0 <- g0 + theme(#axis.line=element_blank(),
                          #axis.text.x=element_blank(),
                          #axis.text.y=element_blank(),
                          #axis.ticks=element_blank(),
@@ -743,7 +798,7 @@ server <- shinyServer(function(input, output   ) {
                          axis.title=element_text(size=12,face="bold"),
                          #axis.title.y=element_blank(),
                          legend.position="none",
-                         panel.background=element_blank(),
+                         #anel.background=element_blank(),
                          #panel.grid.major=element_blank(),
                          #panel.grid.minor=element_blank(),
                          # plot.background=element_blank())
@@ -751,14 +806,20 @@ server <- shinyServer(function(input, output   ) {
                          plot.title = element_text(size = 16),
                        strip.text.x = element_text(size = 16, colour = "black", angle = 0),
                        strip.background = element_rect(fill="ivory"),
-                       panel.border = element_blank())
+                       panel.border = element_blank(),
+                       panel.grid.major = element_blank(), 
+                       panel.grid.minor = element_blank(),
+                       panel.background = element_blank(), 
+                       axis.line = element_line(colour = "black")
+                       )
         print(g0)
         
+                       
         
     })
         #
         #################################################################
-        
+        # rubens data
         
         output$diff4 <- renderPlot({      
           
@@ -866,24 +927,29 @@ server <- shinyServer(function(input, output   ) {
             
             theme_bw()  
           
-          g0 <- g0 + theme(axis.line=element_blank(),
-                           #axis.text.x=element_blank(),
-                           #axis.text.y=element_blank(),
-                           #axis.ticks=element_blank(),
-                           #axis.title.x=element_blank(),
-                           axis.text=element_text(size=12),
-                           axis.title=element_text(size=12,face="bold"),
-                           #axis.title.y=element_blank(),
-                           legend.position="none",
-                           panel.background=element_blank(),
-                           #panel.grid.major=element_blank(),
-                           #panel.grid.minor=element_blank(),
-                           # plot.background=element_blank())
-                           #plot.margin = unit(c(1,1,1,1), "cm")
-                           plot.title = element_text(size = 16),
-                           strip.text.x = element_text(size = 16, colour = "black", angle = 0),
-                           strip.background = element_rect(fill="ivory"),
-                           panel.border = element_blank())
+          g0 <- g0 + theme(#axis.line=element_blank(),
+            #axis.text.x=element_blank(),
+            #axis.text.y=element_blank(),
+            #axis.ticks=element_blank(),
+            #axis.title.x=element_blank(),
+            axis.text=element_text(size=12),
+            axis.title=element_text(size=12,face="bold"),
+            #axis.title.y=element_blank(),
+            legend.position="none",
+            #anel.background=element_blank(),
+            #panel.grid.major=element_blank(),
+            #panel.grid.minor=element_blank(),
+            # plot.background=element_blank())
+            #plot.margin = unit(c(1,1,1,1), "cm")
+            plot.title = element_text(size = 16),
+            strip.text.x = element_text(size = 16, colour = "black", angle = 0),
+            strip.background = element_rect(fill="ivory"),
+            panel.border = element_blank(),
+            panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            panel.background = element_blank(), 
+            axis.line = element_line(colour = "black")
+          )
           print(g0)
           
           
