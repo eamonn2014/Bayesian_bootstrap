@@ -23,7 +23,7 @@ fig.height2 <- 300#50
 fig.width3 <- 1400  
 fig.height3 <- 600#400
 fig.width4 <- 1380
-fig.height4 <- 300
+fig.height4 <- 450
 
 fig.width5 <- 1380
 fig.height5 <- 600
@@ -51,10 +51,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h2("The Bayesian Bootstrap"),
                 
-                h4("There is a Bayesian analogue of the familiar frequentist bootstrap. We investigate using a coded up function and two
+                h4("There is a Bayesian analogue of the familiar frequentist bootstrap [1]. We investigate using a coded up function and two
                 functions from R packages. We also run a frequentist bootstrap. We look at estimating a mean from a normal distribution and 
-                correlation coefficient between two samples. In the case of the mean n-1 uniform samples are drawn and the n gaps then become 
-                the probabilities for incorporation in the boostrap sample [1]. We also use a published dataset to estimate correlation.
+                correlation coefficient between two groups of samples. In the case of the mean, n-1 uniform samples are drawn and the n gaps then become 
+                the probabilities for incorporation in the boostrap sample [2]. We also use a published dataset to estimate correlation [1].
               "), 
                 
                 h3("  "), 
@@ -155,7 +155,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               (the gaps between uniform random variables follow the dirichlet distribution) to derive the probability of inclusion.
                                                The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
-                                           h4(paste("xxxxxx")), 
+                                           h4(paste("Figure 1 Bayesian and frequentist distributions, estimating one sample mean")), 
                                            div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
                                            
                                            h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
@@ -165,14 +165,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            
                                            fluidRow(
                                                column(width = 5, offset = 0, style='padding:1px;',
-                                                      h4("Frequentist bootstrap and Bayesian bootstrap posterior summary of distributions, median and 95% intervals and T-test estimates"), 
+                                                      h4("Summaries of distributions, median and 95% intervals plus T-test estimates"), 
                                                       div( verbatimTextOutput("reg.summary2"))
                                                )),
-                                           
-                                           
-                                           
-                                           
-                                  ) ,
+                                   ) ,
                         
                                   
                                   tabPanel("2 Estimating correlation using simulated data", value=3, 
@@ -183,10 +179,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
                     We use the Fisher z transformation to plot each distribution. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
-                
-                
+                h4(paste("Figure 2 Bayesian and frequentist distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
-                                           
                                            
                                   ),
                                   
@@ -200,9 +194,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
                                                   The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
-                                          
+                                           h4(paste("Figure 3 Bayesian and frequentist distributions, estimating correlation")),  
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
-                                           
                                            
                                   ),
                                   
@@ -438,6 +431,14 @@ server <- shinyServer(function(input, output   ) {
         panel.background = element_blank(), 
         axis.line = element_line(colour = "black")
       )
+      
+      g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
+                      #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+                      #caption = "Source: the Lahman baseball database" 
+        ) 
+      
+      
+      
       print(g0)
       
          
