@@ -49,11 +49,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                     direction = "bottom"
                 ),
                 
-                h2("Bayesian bootstrap"),
+                h2("The Bayesian Bootstrap"),
                 
                 h4("There is a Bayesian analogue of the familiar frequentist bootstrap. We investigate using a coded up function and two
                 functions from R packages. We also run a frequentist bootstrap. We look at estimating a mean from a normal distribution and 
-                corellation coefficient between two samples. In the case of the mean n-1 uniform samples are drawn and the n gaps then become 
+                correlation coefficient between two samples. In the case of the mean n-1 uniform samples are drawn and the n gaps then become 
                 the probabilities for incorporation in the boostrap sample [1]. We also use a published dataset to estimate correlation.
               "), 
                 
@@ -106,14 +106,14 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                  
                                       div(h5("References:")),  
                                       
-                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", "[1] Efron"),
+                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", "[1] Efron's paper"),
                                       div(p(" ")),
-                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338", "[2] Rubin"),
+                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338", "[2] Rubin's paper"),
                                       div(p(" ")),
-                                      tags$a(href = "https://en.wikipedia.org/wiki/Beta_distribution", "[3] Beta distribution"),
+                                      tags$a(href = "https://blogs.sas.com/content/iml/2017/09/20/fishers-transformation-correlation.html", "[3] Fisher's z transformation"),
                                       div(p(" ")),
-                                      tags$a(href = "https://www.tjmahr.com/bayesian-fisher-exact-test/", "[4] Blog article"),
-                                      div(p(" ")),
+                                      # tags$a(href = "https://www.tjmahr.com/bayesian-fisher-exact-test/", "[4] Blog article"),
+                                      # div(p(" ")),
                                       
                                       
                                   )
@@ -142,120 +142,56 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
                    ")),
                                   
-                                  # tabPanel("1 Empty", value=7, 
-                                  #          
-                                  #          
-                                  #          fluidRow(
-                                  #              
-                                  #              
-                                  #              column(width = 7, offset = 0, style='padding:0px;',
-                                  #                     
-                                  #                     h4("Prior distributions"), 
-                                  #                     #      div(plotOutput("trt.plot", width=fig.width2, height=fig.height2)), 
-                                  #                     
-                                  #                     
-                                  #                     h4("Posterior distributions updated with the observed data"), 
-                                  #                     #    div(plotOutput("trt.plot1", width=fig.width2, height=fig.height2)),       
-                                  #                     
-                                  #                     
-                                  #                     
-                                  #              ))
-                                  #          
-                                  # ) ,
+                              
                                   
                                   tabPanel("1 Estimating a one sample mean", value=7, 
                                            
                                           
                                                     h4("Using the the inputs we can control the number of Monte Carlo simulations, the sample size and 
-                                                    the true population mean.
-               We present from the left, the familiar frequentist approach. With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
-                                              and the
-                                              n gap sizes are then the probability for inclusion in a bootstrap sample, of which the mean is then estimated.
-               
-               
-               The next Bayesian bootstrap distribution is generated using the dirichlet distribution with n draws from this distribution
-               (the gaps between uniform random variables follow 
-               the dirichlet distribution) to derive the probability of inclusion.
-              
-                   The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                                                    the true population mean. We present from the left, the familiar frequentist approach. 
+                                                    With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
+                                              and the n gap sizes are then the probability for inclusion in a bootstrap sample, of which the mean is then estimated. 
+                                              The next Bayesian bootstrap distribution is generated using the dirichlet distribution with n draws from this distribution
+                                              (the gaps between uniform random variables follow the dirichlet distribution) to derive the probability of inclusion.
+                                               The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
+                                           h4(paste("xxxxxx")), 
+                                           div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
+                                           
+                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
+                                           
+                                           
+                                           
+                                           
                                            fluidRow(
                                                column(width = 5, offset = 0, style='padding:1px;',
-                                                      
                                                       h4("Frequentist bootstrap and Bayesian bootstrap posterior summary of distributions, median and 95% intervals and T-test estimates"), 
                                                       div( verbatimTextOutput("reg.summary2"))
                                                )),
                                            
                                            
                                            
-                                           h4(paste("dump this")), 
-                                           div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
-                                           
-                                           h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population estimates and the black dashed lines true population mean")), 
-                                           
                                            
                                   ) ,
-                                  
-                                  
-                                  
-                                  
-                                  # tabPanel("Frequentist and Bayesian posterior distributions of Mean", value=3, 
-                                  #          
-                                  #          h6("Sort and filter on the fly."),
-                                  #          h4("Posterior distributions summaries, p(efficacy) will be judged by p(trt>ctrl)"), 
-                                  #          #  DT::dataTableOutput("tablex"),
-                                  #          h4(paste("Posterior distributions : 1 risk difference (trt-ctrl);","2 relative risk (trt/ctrl); 3 odds ratio [odds(trt)/odds(ctrl)]")), 
-                                  #          div(plotOutput("diff2", width=fig.width3, height=fig.height3)),  
-                                  #          h6(paste("Blue vertical lines demark 95% credible intervals, red dashed lines are population values of interest")), 
-                                  # ),
+                        
                                   
                                   tabPanel("2 Estimating correlation using simulated data", value=3, 
                 h4("Using the the inputs we can control the number of Monte carlo simulations, the sample size and the true population correlation.
                We present clockwise from top left, 
-                                              an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
+                                              an Bayesian bootstrap approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
                                               and the
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
                     We use the Fisher z transformation to plot each distribution. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
                 
-                # require(Hmisc)
-                # dboot <- function(data.set) {
-                #   u <- c(0, sort(runif(length(data.set) - 1)), 1)
-                #   g <- diff(u)
-                #   #return( wtd.quantile(data.set, weights=g, probs=.5, normwt=T))
-                #   return( wtd.mean(data.set, weights=g))
-                # }
-                # 
-                # #http://rsnippets.blogspot.ie/2012/11/simple-bayesian-bootstrap.html
-                # library(gtools)
-                # 
-                # # Bayesian bootstrap
-                # mean.bb <- function(x, n) {
-                #   apply(rdirichlet(n, rep(1, length(x))), 1, weighted.mean, x = x)
-                # }
-                # 
-                # # standard bootstrap
-                # mean.fb <- function(x, n) {
-                #   replicate(n, mean(sample(x, length(x), TRUE)))
-                # }
                 
-                
-                
-                
-                
-                                          # h4("xxxxxxxxxxxxxxxxx"),
-                                           #   div( verbatimTextOutput("fisher")),
-                                           #h4("2-sample test for equality of proportions without continuity correction"), 
-                                           #   div( verbatimTextOutput("prop")),
-                                           #h4("Logistic regression odds ratio"), 
-                                           #   div( verbatimTextOutput("logregx")),
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
                                            
                                   ),
                                   
                                   
-                                  tabPanel("3 Estimating correlation using a published dataset", value=3, 
+                                  tabPanel("3 Estimating correlation using Efron's dataset", value=3, 
                                            h4("We use the dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
                                               of 9 samples [1]. Figure 1 in the paper is very similar to the frequentist histogram here.
                                               We use the Fisher z transformation to plot each distribution. The only user input that has
@@ -264,17 +200,40 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
                                                   The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
-                                           #h4("xxxxxxxxxxxxxxxxx"),
-                                           #   div( verbatimTextOutput("fisher")),
-                                           #h4("2-sample test for equality of proportions without continuity correction"), 
-                                           #   div( verbatimTextOutput("prop")),
-                                           #h4("Logistic regression odds ratio"), 
-                                           #   div( verbatimTextOutput("logregx")),
+                                          
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
                                            
                                            
-                                  )
+                                  ),
                                   
+                 
+                
+                
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                tabPanel("4 Efron's dataset", value=3, 
+                         h4("Efron's dataset."),
+                         
+                         fluidRow(
+                           column(
+                         DT::dataTableOutput("tablex"),width = 6)
+                         )
+                         
+                         
+                      
+                         
+                         
+                ) 
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
                               )
                               #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     )
@@ -303,7 +262,7 @@ server <- shinyServer(function(input, output   ) {
         # mean and sD
         ctr <- as.numeric(unlist(strsplit(input$vec4,",")))
         
-        #sample size for corelation
+        #sample size for correlation
         n1y1 <- as.numeric(unlist(strsplit(input$n1y1,","))) #trt
         # R
         n2y2 <- as.numeric(unlist(strsplit(input$n2y2,",")))
@@ -359,18 +318,7 @@ server <- shinyServer(function(input, output   ) {
             replicate(n, mean(sample(x, length(x), TRUE)))
         }
         
-        
-        
-        
-        
-        
-        
-        #set.seed(2131)
-        #reps <- I
-        #reps <- 10
-       # x <- rnorm(100, mean=0, sd=1)
-      #  x <- rnorm(n, mean=mu1, sd=sd1)
-        
+      
         
         fbq<-bbq<-bb2<-NULL
         
@@ -398,95 +346,163 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$diff <- renderPlot({         
+        ###############################################################
+      
+      
+      sample <- random.sample()
+      mu1 <- sample$ctr.alpha
+      sd1 <- sample$ctr.beta
+      n    <- sample$n1
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      A <- mcmc()$A
+      B <- mcmc()$B
+      C <- mcmc()$C
+      
+      foo <- cbind(A,B,C)
+      foo1 <- reshape::melt(foo)
+      
+      
+      levels(foo1$X2)
+      
+      Ae <-  est <- quantile(A, c(.025,.5,.975)) 
+      A <-  paste("Frequentist : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+      
+      Be <-   est <- quantile(B, c(.025,.5,.975))  
+      B <-  paste("Bayesian : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+      
+      Ce<-  est <- quantile(C, c(.025,.5,.975))  
+      C <-  paste("Bayesian2 : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+      
+    
+      
+      #make a dataset to add lines to ggplot facets
+      
+      dummy2 <- data.frame(X2=c(paste("",A),
+                                paste("",B),
+                                paste("",C)
+      ),  
+      q1 =  c(Ae[1], Be[1], Ce[1]),
+      q50 = c(Ae[2], Be[2], Ce[2]),
+      q3 =  c(Ae[3], Be[3], Ce[3])
+      ) 
+      
+      
+      levels(foo1$X2) <- c(paste("",A),
+                           paste("",B),
+                           paste("",C) 
+      )
+      
+       r <-  mu1+5* sd1
+       p <-  seq(-r, r, sd1/n) #(r--r)/10)
+      
+      library(scales)
+      g0 <- ggplot(data=foo1, aes(x = value)) +#
+        geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
+        geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
+        geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
+        geom_vline( aes(xintercept = mu1,  colour="black", linetype = "dash")) +
+        geom_histogram( aes(y = ..density..), bins=100, colour="black" , fill=rainbow(300))+     ylab("")+
+        geom_density(alpha = 0.1, fill = "red") +
+        facet_wrap(X2~ .) 
+      
+      
+      g0 <- g0  + scale_x_continuous(breaks= p, 
+                                     xlab("Mean"),
+                                     oob=discard) +
+        #xlim(-Inf,Inf) +
+        scale_y_continuous(breaks = NULL) +
         
-        z <- mcmc()$A
-        mu1 <- mcmc()$mu1
-        
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
-        par(bg = 'lightgoldenrodyellow') 
-        par(mfrow=c(1,3))
-        plot(density(z),
-             xlab="Frequentist Bootstrap, Mean estimate",
-             ylab="Density",
-             main="",
-             ylim=c(0,max(density(z)$y)),
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=q[3], col="red", lty='dashed')
-        abline(v=mu1, col="black", lty='dashed')
-        
-        z <- (mcmc()$B)
-        
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
-        
-        plot(density(z), #log="x",
-             xlab="Bayesian Bootstrap, Mean estimate",
-             ylab="Density",
-             main="",
-             ylim=c(0, max(density(z)$y)),##
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=q[3], col="red", lty='dashed')
-        abline(v=mu1, col="black", lty='dashed')
-        
-        
-        z <- mcmc()$C
-        
-        q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
-        
-        plot(density(z), #  log="x",
-             xlab="Bayesian Bootstrap 2, Mean estimate",
-             ylab="Density",
-             main="",
-             ylim=c(0, max(density(z)$y)),
-             frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
-        abline(v=q[1], col="blue") #95% credible interval
-        abline(v=q[5], col="blue")
-        abline(v=q[3], col="red", lty='dashed')
-        abline(v=mu1, col="black", lty='dashed')
-        
-        captio=("xxxx")
-        
-        
-        
-        par(mfrow=c(1,1))
-        
+        theme_bw()  
+      
+      g0 <- g0 + theme(#axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        #axis.ticks=element_blank(),
+        #axis.title.x=element_blank(),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="bold"),
+        #axis.title.y=element_blank(),
+        legend.position="none",
+        #anel.background=element_blank(),
+        #panel.grid.major=element_blank(),
+        #panel.grid.minor=element_blank(),
+        # plot.background=element_blank())
+        #plot.margin = unit(c(1,1,1,1), "cm")
+        plot.title = element_text(size = 16),
+        strip.text.x = element_text(size = 16, colour = "black", angle = 0),
+        strip.background = element_rect(fill="ivory"),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black")
+      )
+      print(g0)
+      
+         
     })
     
+   ### not used replaced by diff 
+    output$diffx <- renderPlot({         
+      
+      z <- mcmc()$A
+      mu1 <- mcmc()$mu1
+      
+      q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
+      par(bg = 'lightgoldenrodyellow') 
+      par(mfrow=c(1,3))
+      plot(density(z),
+           xlab="Frequentist Bootstrap, Mean estimate",
+           ylab="Density",
+           main="",
+           ylim=c(0,max(density(z)$y)),
+           frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
+      abline(v=q[1], col="blue") #95% credible interval
+      abline(v=q[5], col="blue")
+      abline(v=q[3], col="red", lty='dashed')
+      abline(v=mu1, col="black", lty='dashed')
+      
+      z <- (mcmc()$B)
+      
+      q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
+      
+      plot(density(z), #log="x",
+           xlab="Bayesian Bootstrap, Mean estimate",
+           ylab="Density",
+           main="",
+           ylim=c(0, max(density(z)$y)),##
+           frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
+      abline(v=q[1], col="blue") #95% credible interval
+      abline(v=q[5], col="blue")
+      abline(v=q[3], col="red", lty='dashed')
+      abline(v=mu1, col="black", lty='dashed')
+      
+      
+      z <- mcmc()$C
+      
+      q <- quantile(z,c(.025, 0.25, 0.5, 0.75, 0.975))
+      
+      plot(density(z), #  log="x",
+           xlab="Bayesian Bootstrap 2, Mean estimate",
+           ylab="Density",
+           main="",
+           ylim=c(0, max(density(z)$y)),
+           frame.plot=FALSE,cex.lab=1.5,lwd=3,yaxt="no")
+      abline(v=q[1], col="blue") #95% credible interval
+      abline(v=q[5], col="blue")
+      abline(v=q[3], col="red", lty='dashed')
+      abline(v=mu1, col="black", lty='dashed')
+      
+      captio=("xxxx")
+      
+      
+      
+      par(mfrow=c(1,1))
+      
+    })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    output$trt.plot <- renderPlot({         
-        
-        # sample <- random.sample()
-        # 
-        # x<- seq(0.001,.999, length.out=10000)
-        # 
-        # trt.alpha<- sample$trt.alpha
-        # trt.beta<-  sample$trt.beta
-        # ctr.alpha<- sample$ctr.alpha
-        # ctr.beta<-  sample$ctr.beta
-        # 
-        # 
-        # tmp1 <- max(c(dbeta(x, trt.alpha, trt.beta)  ) )
-        # tmp2 <- max(c(dbeta(x, ctr.alpha, ctr.beta)))
-        # tmp <- max(tmp1, tmp2)
-        # 
-        # par(bg = 'lightgoldenrodyellow')
-        # 
-        # 
-        # curve(dbeta(x, trt.alpha, trt.beta),col = "blue", xlab = c("Probabiity"), 
-        #       main=paste0("The Beta distribution for treatment in blue with shape parameters (",p2(trt.alpha),", ",p2(trt.beta),") and control in black (",p2(ctr.alpha),", ",p2(ctr.beta),")             "  
-        #       ),
-        #       ylab = "Density", xlim=c(0.0,1),  ylim=c(0, (tmp)*1.1) #ylim=c(0, max(
-        # )
-        # curve(dbeta(x, ctr.alpha, ctr.beta),col = "black", xlab = c("Probabiity"), 
-        #       
-        #       ylab = "Density",  add=TRUE
-        # )
-        
-    })
+   
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
@@ -724,7 +740,8 @@ server <- shinyServer(function(input, output   ) {
           xx1 <- cor1()$xx1
           
           sample <- random.sample()
-          
+       
+          r    <- sample$n2
        #   n    <- sample$n1
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
@@ -776,9 +793,12 @@ server <- shinyServer(function(input, output   ) {
           geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
           geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
           geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
-         geom_histogram( bins=100, colour="black" , fill=rainbow(400))+     ylab("")+
+         geom_vline( aes(xintercept = r,  colour="black", linetype = "dash")) +
+         
+         geom_histogram( aes(y = ..density..), bins=100, colour="black" , fill=rainbow(400))+     ylab("")+
+          geom_density(alpha = 0.1, fill = "red") +
           facet_wrap(X2~ .) 
-       
+        
    
           g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
                                         breaks= p, 
@@ -814,9 +834,26 @@ server <- shinyServer(function(input, output   ) {
                        )
         print(g0)
         
+        
+        
+        
+        
+        
                        
         
     })
+        
+        ruben <- reactive({
+          
+        
+          dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
+          efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
+          data.set <- data.frame(dye,efp)
+          
+          return(list(data.set=data.set)) 
+  
+        
+        })
         #
         #################################################################
         # rubens data
@@ -826,14 +863,16 @@ server <- shinyServer(function(input, output   ) {
           
           sample <- random.sample()
           
+          data.set <- ruben()$data.set
+          
     
           reps <- sims <- sample$sims
           
           
           library(LaplacesDemon)
-          dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
-          efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
-          data.set <- data.frame(dye,efp)
+          # dye <- c(1.15, 1.7, 1.42, 1.38, 2.8, 4.7, 4.8, 1.41, 3.9)
+          # efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
+          # data.set <- data.frame(dye,efp)
          
           len <- length(dye)
           
@@ -916,9 +955,11 @@ server <- shinyServer(function(input, output   ) {
             geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
             geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
             geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
-            geom_histogram( bins=100, colour="black" , fill=rainbow(400))+  ylab("")+
+            geom_histogram(aes(y = ..density..), bins=100, colour="black" , fill=rainbow(400))+  ylab("")+
+            geom_density(alpha = 0.1, fill = "red") +
             facet_wrap(X2~ .) 
           
+           
           
           g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
                                          breaks= p, xlab("Correlation"),
@@ -961,54 +1002,29 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     output$tablex <- DT::renderDataTable({
         
-        # mc <- mcmc()$f1
-        # # s1 <- stan()$f
-        # # s2 <- stan2()$res
-        # 
-        # A <- (mc)
-        # # B <- (s1)
-        # # C <- (s2)
-        # 
-        # A <- data.frame(A)
-        # # B <- data.frame(B)
-        # # C <- data.frame(C)
-        # 
-        # A$model <- "Bayesian Monte Carlo"
-        # # B$model <- "Bayes proportions"
-        # # C$model <- "Bayes logistic reg."
-        # # 
-        # A$parameter = rownames(A)
-        # # B$parameter = rownames(B)
-        # # C$parameter = rownames(C)
-        # 
-        # x <-A# rbind(A,B,C)
-        # #x$parameter = rownames(x)
-        # 
-        # names(x) <- c("Mean","p2.5","p25","p50","p75","p975","Model","parameter")
-        # x <- x[,c("Model","parameter","Mean","p2.5","p25","p50","p75","p975")]
-        # 
-        # 
-        # rownames(x) <- NULL
-        # x$Model <- NULL
-        # foo <- x
-        # datatable(x,
-        #           
-        #           rownames = FALSE,
-        #           
-        #           options = list(
-        #               searching = TRUE,
-        #               #pageLength = 20,
-        #               paging=FALSE,
-        #               lengthMenu = FALSE ,
-        #               lengthChange = FALSE,
-        #               autoWidth = FALSE
-        #               # colReorder = TRUE,
-        #               # deferRender = TRUE,
-        #               # scrollY = 200,
-        #               # scroller = T
-        #           ))  %>% 
-        #     formatRound(
-        #         columns= c("parameter","Mean","p2.5","p25","p50","p75","p975"), digits=c(0,3,3,3,3,3,3)  )
+        d <- ruben()$data.set
+     
+        x <- d
+ 
+        foo <- x
+         datatable(x,
+                   
+                   rownames = TRUE,
+                   
+                   options = list(
+                       searching = TRUE,
+                       #pageLength = 20,
+                       paging=FALSE,
+                       lengthMenu = FALSE ,
+                       lengthChange = FALSE,
+                       autoWidth = TRUE
+                       # colReorder = TRUE,
+                       # deferRender = TRUE,
+                       # scrollY = 200,
+                       # scroller = T
+                   ))  %>% 
+             formatRound(
+                 columns= c("dye","efp"), digits=c(2,2)  )
         
     })
     
