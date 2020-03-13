@@ -979,7 +979,7 @@ server <- shinyServer(function(input, output   ) {
                        # scroller = T
                    ))  %>% 
              formatRound(
-                 columns= c("dye","efp"), digits=c(2,2)  )
+                 columns= c("dye","efp"), digits=c(2,2)  ) 
         
     })
     
