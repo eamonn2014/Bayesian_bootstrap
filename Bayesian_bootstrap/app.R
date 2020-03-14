@@ -57,7 +57,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h2("The Bayesian Bootstrap (philosophic numbers smooth)*"), 
                 
-                h4("I assume some familiarity with statistics and bootstrapping [1]. There is a Bayesian analogue of the familiar frequentist bootstrap [2,3]. We investigate the Bayesian bootstrap using functions
+                h4("I assume some familiarity with statistics and bootstrapping [1]. We explore the Bayesian analogue 
+                of the more familiar frequentist bootstrap [2,3]. We proceed using functions
                 coded up and 
                 functions from R packages. We also run a frequentist nonparametric bootstrap approach. We look at (i) estimating a mean from one sample from a normal distribution and 
                 (ii) estimating a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds by drawing n-1 uniform samples, 
@@ -105,24 +106,24 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                 
                                      # h4("------------------------------------All tabs------------------------------------"), 
                                       textInput('sims', 
-                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (tabs 1-3)"))), "5000"),
+                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (used on tabs 1,2,3 & 5)"))), "5000"),
                                      tags$hr(),
                                       #h4("------------------------------------tab 2 inputs only-------------------------"),
                                       textInput('vec3', 
                                               #  div(h5("Number of samples for mean (tab 1)")), "100"),
-                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (tab 1 only)"))), "5"),
+                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (used on tab 1 only)"))), "5"),
                                       
                                       textInput('vec4', 
                                            #     div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
-                                     div(h5(tags$span(style="color:blue", "Enter the true mean and sd for a normal distribution (tab 1 only)"))), "10, 5"),
+                                     div(h5(tags$span(style="color:blue", "Enter the true mean and sd for a normal distribution (used on tab 1 only)"))), "10, 5"),
                                       #h4("------------------------------------tab 3 inputs only-------------------------"),
                                      tags$hr(), 
                                      textInput('n1y1', 
                                              #   div(h5("Number of samples for Correlation (tab 2)")), "10"),
-                                     div(h5(tags$span(style="color:blue", "Number of samples for Correlation (tab 2 only)"))), "10"),
+                                     div(h5(tags$span(style="color:blue", "Number of samples for Correlation (used on tab 2 only)"))), "10"),
                                       textInput('n2y2', 
                                           #      div(h5("Enter the true correlation (tab 2)")), ".8"),
-                                     div(h5(tags$span(style="color:blue", "Enter the true correlation (tab 2 only)"))), "0.8"),
+                                     div(h5(tags$span(style="color:blue", "Enter the true correlation (used on tab 2 only)"))), "0.8"),
                                      tags$hr(),
                                       #h4("-----------------------------------------------------------------------------------"),
                                  
@@ -260,10 +261,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                          
                          h4(("Here are two example data sets (download either file and click 'Browse...' to locate and upload for the analysis):")) ,
                          
-                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/icreamsales", tags$span(style="color:blue", "Example 1 Ice cream sale and temperature"),), 
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/icreamsales", tags$span(style="color:blue", "Example 1 Ice cream sales and temperature N=12, has a header"),), 
                          div(p(" ")),
                          
-                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/height.selfesteem", tags$span(style="color:blue", "Example 2 height and self esteem"),), 
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/height.selfesteem", tags$span(style="color:blue", "Example 2 height and self esteem N=20, no header"),), 
                          div(p(" ")),
                          
                          sidebarLayout(
@@ -323,7 +324,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                            mainPanel(
                              
                              # Output: Data file ----
-                             
+                             h4(paste("Figure 4. Bayesian and frequentist bootstrap distributions of user's data, estimating correlation")),  
                              div(plotOutput("contents2", width=fig.width6, height=fig.height6)),
                              #div(verbatimTextOutput("contents2")),
                              #plotOutput("plotx"),
@@ -358,8 +359,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
 server <- shinyServer(function(input, output   ) {
     
-    shinyalert("There's a Bayesian bootstrap!",
-               "And it's pretty...pretty...pretty...smooth",
+    shinyalert("The Bayesian bootstrap!",
+               "And it's pretty...pretty...pretty...cool",
                type = "info")
   
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1159,20 +1160,24 @@ server <- shinyServer(function(input, output   ) {
        usercor <- reactive({ 
         
          # sample <- random.sample()
-        
-          df<-NULL
-          req(input$file1)
-          df <- read.csv(input$file1$datapath,
-                         header = input$header,
-                         sep = input$sep,
-                         quote = input$quote)
-          
-          df<- as.data.frame(df)
-          
-          
-          names(df) <-c("A","B")
+         sample <- random.sample()
+         reps <- sims <- sample$sims
+         
+         df<-NULL
+         req(input$file1)
+         df <- read.csv(input$file1$datapath,
+                        header = input$header,
+                        sep = input$sep,
+                        quote = input$quote)
+         
+         df<- as.data.frame(df)
+         
+         
+         names(df) <-c("A","B")
+         
           z1 <- cor.test(df$A,df$B)
-          z1 <- c( as.vector(z1$parameter)+2, unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+          xx <- as.integer(as.vector(z1$parameter)+2)
+          z1 <- c( (xx), unlist(z1$estimate), unlist(z1$conf.int)[1:2])
        
          names(z1) <- c("N","Estimate","Lower","Upper")
         
