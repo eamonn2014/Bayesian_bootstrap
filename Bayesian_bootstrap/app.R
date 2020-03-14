@@ -61,8 +61,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 (ii) estimating a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds by drawing n-1 uniform samples, 
                 the size of the n gaps between the uniform draws
                 then become 
-                the probabilities for incorporation of the original n samples into the boostrap sample [2]. The parameter is then calculated from the bootstrap sample and the process repeated a large number of times. On the third tab we also use a published dataset to estimate correlation [3]. 
-                An (unverified) observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with 'respect to the resulting 
+                the weights for the calculation, hence the smoothness* generally of the Bayesian distibution in comparison to the frequentist. 
+                This process is repeated a large number of times. 
+               On the third tab we also use a published dataset to estimate correlation [3]. 
+                 A more general advantage of the Bayesian bootstrap with 'respect to the resulting 
                 inferences about parameters is that 
                 the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters' [2].
 
@@ -100,12 +102,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       ),
                                      # h4("------------------------------------All tabs------------------------------------"), 
                                       textInput('sims', 
-                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (tabs 1-3)"))), "1000"),
+                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (tabs 1-3)"))), "5000"),
                                       
                                       #h4("------------------------------------tab 2 inputs only-------------------------"),
                                       textInput('vec3', 
                                               #  div(h5("Number of samples for mean (tab 1)")), "100"),
-                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (tab 1 only)"))), "100"),
+                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (tab 1 only)"))), "5"),
                                       
                                       textInput('vec4', 
                                            #     div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
@@ -166,7 +168,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                     the true population mean and true standard deviation. We present from the left, the familiar 
                                                     nonparametric frequentist bootstrap percentile approach. 
                                                     With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
-                                              and the n gap sizes are then the probability for inclusion of the original samples into a bootstrap sample, the mean is then estimated. 
+                                              and the n gap sizes are 
+                the weights for the calculation of a weighted mean, this process is repeated a large number of times.
+                                              
+                                              . 
                                               The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
                                               (the gaps between uniform random variables follow the Dirichlet distribution) to derive the probability of inclusion.
                                                The result from a t-test is also provided below the plot. The true population value, the estimated median, 2.5 and 97.5 percentiles are presented for each distribution."),
@@ -193,6 +198,14 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h4(paste("Figure 2. Bayesian and frequentist bootstrap distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
+                fluidRow(
+                  column(width = 7, offset = 0, style='padding:1px;',
+                         h4("Correlation and 95% confidence interval from R cor.test function"), 
+                         div( verbatimTextOutput("reg.summary3"))
+                  )),
+                
+                
+                
                                   ),
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("3 Estimating correlation using Efron's dataset", value=3, 
@@ -200,12 +213,19 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               of 9 samples [3]. Figure 1 in the paper is very similar in shape to the frequentist histogram here (the data are printed in the figure footnote [3]).
                                               We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
-                                              an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 and the
-                                              n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
+                                              an approach in which n paired samples are analysed first by drawing 8 random uniform values between 0 and 1 and the
+                                              9 gap sizes are then the weights used to calculate correlation. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
                                                   The median and 2.5 and 97.5 percentiles are presented for each distribution."),
                                            h4(paste("Figure 3. Bayesian and frequentist bootstrap distributions, estimating correlation")),  
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
+                                           
+                                           fluidRow(
+                                             column(width = 7, offset = 0, style='padding:1px;',
+                                                    h4("Correlation and 95% confidence interval from R cor.test function"), 
+                                                    div( verbatimTextOutput("reg.summary4"))
+                                             )),
+                                           
                                            
                                   ),
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -328,7 +348,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 server <- shinyServer(function(input, output   ) {
     
     shinyalert("You better believe it, there's a Bayesian bootstrap!",
-               "And It's pretty, pretty good",
+               "And it's pretty, pretty, pretty smooth",
                type = "info")
   
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -589,6 +609,20 @@ server <- shinyServer(function(input, output   ) {
         return(print(mcmc()$res, digits=4))
         
     })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # correlation from simulation
+    output$reg.summary3 <- renderPrint({
+      
+      return(print(cor1()$z1, digits=4))
+      
+    })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # correlation Efrom data
+    output$reg.summary4 <- renderPrint({
+      
+      return(print(ruben()$z2, digits=4))
+      
+    })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # run the correlation analysis for tab 2
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -608,8 +642,11 @@ server <- shinyServer(function(input, output   ) {
             return(Z)
         } 
         
-        z<-CorrNorm(n=n,rho=r)
-        cor.test(z[,1],z[,2])
+        z <- CorrNorm(n=n,rho=r)
+        z1 <- cor.test(z[,1],z[,2])
+        z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+        #z1 <- data.frame(z1)
+        names(z1) <- c("Estimate","Lower","Upper")
         
         data.set <- data.frame(z[,1],z[,2])
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -637,7 +674,7 @@ server <- shinyServer(function(input, output   ) {
         BB <- unlist(BB)
         xx1 <- b4$V1
         
-        return(list(f=f, b=b, BB=BB, xx1=xx1)) 
+        return(list(f=f, b=b, BB=BB, xx1=xx1, z1=z1)) 
         
     })
 
@@ -924,7 +961,11 @@ server <- shinyServer(function(input, output   ) {
           efp <- c(1.38, 1.72, 1.59, 1.47, 1.66, 3.45, 3.87, 1.31, 3.75)
           data.set <- data.frame(dye,efp)
           
-          return(list(data.set=data.set)) 
+          z1 <- cor.test(dye,efp)
+          z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+          names(z1) <- c("Estimate","Lower","Upper")
+          
+          return(list(data.set=data.set, z2=z1)) 
 
         })
 
