@@ -316,7 +316,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              
                              # Output: Data file ----
                              
-                             
+                             div(plotOutput("contents2", width=fig.width5, height=fig.height5)),
                              #div(verbatimTextOutput("contents2")),
                              #plotOutput("plotx"),
                              tags$hr(),
@@ -1105,6 +1105,178 @@ server <- shinyServer(function(input, output   ) {
           
           
         })
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # loading in user data, see my PBE bio equiv app
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+        output$contents <- renderTable({
+          
+          # input$file1 will be NULL initially. After the user selects
+          # and uploads a file, head of that data file by default,
+          # or all rows if selected, will be shown.
+          
+          df<- NULL
+          req(input$file1)
+          df <- read.csv(input$file1$datapath,
+                         header = input$header,
+                         sep = input$sep,
+                         quote = input$quote)
+          
+          df <- as.data.frame(df)
+          
+          if(input$disp == "head") {
+            
+            return(head(df))
+          }
+          else {
+            
+            return(df)
+          } 
+          
+        })
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # analyse user data
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        output$contents2 <- renderPrint({
+          
+          sample <- random.sample()
+          reps <- sims <- sample$sims
+          
+            df<-NULL
+            req(input$file1)
+            df <- read.csv(input$file1$datapath,
+                           header = input$header,
+                           sep = input$sep,
+                           quote = input$quote)
+            
+            df<- as.data.frame(df)
+            
+            
+            names(df) <-c("A","B")
+            
+             data.set <- df
+            
+            # library(LaplacesDemon)
+            len <- length(data.set$A)
+            
+            sboot <- function() {
+              cor(data.set[sample(1:len, replace=T),])[1,2]
+            }
+            
+            bboot <- function() {
+              cov.wt(data.set, diff(c(0,sort(runif(len-1)),1)), cor=T)$cor[1,2]
+            }
+            
+            A <- data.set$A
+            B <- data.set$B
+            
+            X <- matrix(c(A, B), len, 2)
+            colnames(X) <- c("A","B")
+            BB <- BayesianBootstrap(X=X, n=sims,
+                                    Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
+            
+            # library(bayesboot)
+            # Using the weighted correlation (corr) from the boot package.
+            #  library(boot)
+            b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
+            
+            
+            f<-replicate(sims, sboot())
+            b<-replicate(sims, bboot())
+            BB <- unlist(BB)
+            xx1 <- b4$V1
+            
+            ff <-  (f)
+            bb <- (b)
+            BBB <- (BB)
+            xx <- (xx1)
+            foo <- cbind(ff,bb,BBB,xx)
+            foo1 <- reshape::melt(foo)
+            
+            levels(foo1$X2)
+            
+            Ce <-  est <- quantile(f, c(.025,.5,.975)) 
+            C <-  paste("Frequentist : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+            
+            Ae <-   est <- quantile(b, c(.025,.5,.975))  
+            A <-  paste("Bayesian : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+            
+            Be<-  est <- quantile(BB, c(.025,.5,.975))  
+            B <-  paste("LaplaceDemon : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+            
+            De<-    est <- quantile(xx1, c(.025,.5,.975))  
+            D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
+            
+            # make a dataset to add lines to ggplot facets
+            
+            dummy2 <- data.frame(X2=c(paste("",A),
+                                      paste("",B),
+                                      paste("",C),
+                                      paste("",D)
+            ),  
+            q1 =  c(Ae[1], Be[1], Ce[1], De[1]),
+            q50 = c(Ae[2], Be[2], Ce[2], De[2]),
+            q3 =  c(Ae[3], Be[3], Ce[3], De[3])
+            )
+            
+            levels(foo1$X2) <- c(paste("",A),
+                                 paste("",B),
+                                 paste("",C),
+                                 paste("",D)
+            )
+            
+            p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
+            #library(scales)
+            g0 <- ggplot(data=foo1, aes(x = value)) +#
+              geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
+              geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
+              geom_vline(data = dummy2, aes(xintercept = q3,  colour="red", linetype = "dotdash")) +
+              geom_histogram(aes(y = ..density..), bins=100, colour="black" , fill=rainbow(400))+  ylab("")+
+              geom_density(alpha = 0.1, fill = "red") +
+              facet_wrap(X2~ .) 
+            
+            
+            
+            g0 <- g0  + scale_x_continuous(trans = atanh_trans()  ,
+                                           breaks= p, xlab("Correlation"),
+                                           oob=discard) +
+              scale_y_continuous(breaks = NULL) +
+              
+              theme_bw()  
+            
+            g0 <- g0 + theme(#axis.line=element_blank(),
+              #axis.text.x=element_blank(),
+              #axis.text.y=element_blank(),
+              #axis.ticks=element_blank(),
+              #axis.title.x=element_blank(),
+              axis.text=element_text(size=12),
+              axis.title=element_text(size=12,face="bold"),
+              #axis.title.y=element_blank(),
+              legend.position="none",
+              #anel.background=element_blank(),
+              #panel.grid.major=element_blank(),
+              #panel.grid.minor=element_blank(),
+              # plot.background=element_blank())
+              #plot.margin = unit(c(1,1,1,1), "cm")
+              plot.title = element_text(size = 16),
+              strip.text.x = element_text(size = 16, colour = "black", angle = 0),
+              strip.background = element_rect(fill="ivory"),
+              panel.border = element_blank(),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.background = element_blank(), 
+              axis.line = element_line(colour = "black")
+            )
+            
+            g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
+              #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+              caption = "The lines indicate the median, 2.5 and 97.5 percentiles" 
+            ) 
+            print(g0)
+            
+            
+        })
+        
         
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # print Ruben's data
