@@ -296,7 +296,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              tags$hr(),
                              
                              # Input: Select number of rows to display ----
-                             radioButtons("disp", "Display",
+                             radioButtons("disp", "List all the data or first 6 rows only",
                                           choices = c(Head = "head",
                                                       All = "all"),
                                           selected = "head"),
@@ -305,10 +305,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              tags$hr(),
                              
                              # Input: Select number of rows to display ----
-                             radioButtons("what", "Output",
-                                          choices = c(Analysis = "Analysis",
-                                                      Plot = "plot"),
-                                          selected = "Analysis")
+                             # radioButtons("what", "Output",
+                             #              choices = c(Analysis = "Analysis",
+                             #                          Plot = "plot"),
+                             #              selected = "Analysis")
                              
                            ),
                            
@@ -321,8 +321,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              #div(verbatimTextOutput("contents2")),
                              #plotOutput("plotx"),
                              tags$hr(),
-                             
-                             #  tableOutput("contents") 
+                             h4("Correlation and 95% confidence interval from R cor.test function"), 
+                             div( verbatimTextOutput("reg.summary5")),
+                             tags$hr(),
+                             h4("Print the data listing"),
+                             tableOutput("contents") 
                              
                              
                            ),
@@ -628,6 +631,15 @@ server <- shinyServer(function(input, output   ) {
       return(print(ruben()$z2, digits=4))
       
     })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # correlation user data
+    output$reg.summary5 <- renderPrint({
+      
+      return(print(usercor()$z1, digits=4))
+      
+    })
+    
+    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # run the correlation analysis for tab 2
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1135,6 +1147,31 @@ server <- shinyServer(function(input, output   ) {
           
         })
         
+        
+        
+       usercor <- reactive({ 
+        
+         # sample <- random.sample()
+        
+          df<-NULL
+          req(input$file1)
+          df <- read.csv(input$file1$datapath,
+                         header = input$header,
+                         sep = input$sep,
+                         quote = input$quote)
+          
+          df<- as.data.frame(df)
+          
+          
+          names(df) <-c("A","B")
+          z1 <- cor.test(df$A,df$B)
+          z1 <- c( as.vector(z1$parameter)+2, unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+       
+         names(z1) <- c("N","Estimate","Lower","Upper")
+        
+         return(list( z1=z1)) 
+        
+        })
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # analyse user data
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
