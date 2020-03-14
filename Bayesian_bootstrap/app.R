@@ -215,9 +215,105 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                          fluidRow(
                            column(
                          DT::dataTableOutput("tablex"),width = 6)
+                         ),
+                         
+                         
+                         
+          
+                           ) ,
+                
+                
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NEW
+                tabPanel("5 Upload data for analysis", fluid = TRUE, width = 4,
+                         
+                         h4(("Upload your own data for analysis. The top two radio button options are to help load,
+                                 the bottom two options are to either show the top six rows of the data or show all the data.
+                               ")) ,
+                         
+                         h4(("Example data sets (download either file and click 'Browse...' to locate and upload for analysis):")) ,
+                         
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", tags$span(style="color:blue", "Example 2"),), 
+                         div(p(" ")),
+                         
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda%20B%20rep%20only", tags$span(style="color:blue", "Example 1"),), 
+                         div(p(" ")),
+                         
+                         sidebarLayout(
+                           
+                           # Sidebar panel for inputs ----
+                           sidebarPanel(
+                             
+                             # Input: Select a file ----
+                             fileInput("file1", "Choose CSV File",
+                                       multiple = TRUE,
+                                       accept = c("text/csv",
+                                                  "text/comma-separated-values,text/plain",
+                                                  ".csv")),
+                             
+                             # Horizontal line ----
+                             tags$hr(),
+                             
+                             # Input: Checkbox if file has header ----
+                             checkboxInput("header", "Header", TRUE),
+                             
+                             # Input: Select separator ----
+                             radioButtons("sep", "Separator",
+                                          choices = c(Comma = ",",
+                                                      Semicolon = ";",
+                                                      Tab = "\t",
+                                                      Whitespace = ""),
+                                          selected = ""),
+                             
+                             # Input: Select quotes ----
+                             radioButtons("quote", "Quote",
+                                          choices = c(None = "",
+                                                      "Double Quote" = '"',
+                                                      "Single Quote" = "'"),
+                                          selected = ''),
+                             
+                             # Horizontal line ----
+                             tags$hr(),
+                             
+                             # Input: Select number of rows to display ----
+                             radioButtons("disp", "Display",
+                                          choices = c(Head = "head",
+                                                      All = "all"),
+                                          selected = "head"),
+                             
+                             # Horizontal line ----
+                             tags$hr(),
+                             
+                             # Input: Select number of rows to display ----
+                             radioButtons("what", "Output",
+                                          choices = c(Analysis = "Analysis",
+                                                      Plot = "plot"),
+                                          selected = "Analysis")
+                             
+                           ),
+                           
+                           # Main panel for displaying outputs ----
+                           mainPanel(
+                             
+                             # Output: Data file ----
+                             
+                             
+                             #div(verbatimTextOutput("contents2")),
+                             #plotOutput("plotx"),
+                             tags$hr(),
+                             
+                             #  tableOutput("contents") 
+                             
+                             
+                           ),
                          )
-                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~             
-                           ) 
+                ) 
+                
+                
+                
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   END NEW   
+                
+                
+                
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         )
                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
