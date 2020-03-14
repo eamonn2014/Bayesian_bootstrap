@@ -157,9 +157,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                     the true population mean and standard deviation. We present from the left, the familiar frequentist bootstrap approach. 
                                                     With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
                                               and the n gap sizes are then the probability for inclusion of the original samples into a bootstrap sample, the mean is then estimated. 
-                                              The next Bayesian bootstrap distribution is generated using the dirichlet distribution with n draws from this distribution
-                                              (the gaps between uniform random variables follow the dirichlet distribution) to derive the probability of inclusion.
-                                               The result from a t-test is also provided in the table. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                                              The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
+                                              (the gaps between uniform random variables follow the Dirichlet distribution) to derive the probability of inclusion.
+                                               The result from a t-test is also provided in the table. The median and 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
                                            h4(paste("Figure 1. Bayesian and frequentist bootstrap distributions, estimating one sample mean")), 
                                            div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
@@ -179,7 +179,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               and the
                                               n gap sizes are then the probability for inclusion in a bootstrap sample, for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
-                    We use the Fisher z transformation to plot each distribution. The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                    We use the Fisher z transformation to plot each distribution. The median and 2.5 and 97.5 percentiles are presented for each distribution."),
                 h4(paste("Figure 2. Bayesian and frequentist bootstrap distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
@@ -193,7 +193,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 and the
                                               n gap sizes are then the probability for inclusion in a bootstrap sample. for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
-                                                  The median and lower 2.5 and 97.5 percentiles are presented for each distribution."),
+                                                  The median and 2.5 and 97.5 percentiles are presented for each distribution."),
                                            h4(paste("Figure 3. Bayesian and frequentist bootstrap distributions, estimating correlation")),  
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
                                            
