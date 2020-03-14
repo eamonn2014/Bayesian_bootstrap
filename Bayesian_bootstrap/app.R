@@ -60,10 +60,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h4("I assume some familiarity with statistics and bootstrapping [1]. We explore the Bayesian analogue 
                 of the more familiar frequentist bootstrap [2,3]. We proceed using functions
                 coded up and 
-                functions from R packages. We also run a frequentist nonparametric bootstrap approach. We look at (i) estimating a mean from one sample from a normal distribution and 
-                (ii) estimating a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds by drawing n-1 uniform samples, 
+                functions from R packages. We include to the frequentist nonparametric bootstrap approach. We (i) estimate a mean from one sample from a normal distribution and 
+                (ii) estimate a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds
+                by drawing n-1 uniform samples, 
                 the size of the n gaps between the uniform draws
-                then become 
+                are the
                 the weights for the calculation, hence the smoothness* of the Bayesian distibution generally in comparison with the frequentist. 
                 This process is repeated a large number of times. 
                On the third tab we also use a published dataset to estimate correlation [3]. The fifth tab allows a correlation analysis of your own data.
@@ -89,7 +90,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   br(), # br(), 
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
-                                  h4("The first input below is the number of Monte Carlo simulations which impacts tabs 1 to 3. 
+                                  h4("The first input below is the number of Monte Carlo simulations which impacts tabs 1,2, 3 and 5. 
                                   The next two inputs impact only tab 1, the number of samples and
                                      the true mean and standard deviation. Tab 2 estimates the uncertainty in a correlation 
                                      coefficient and the last two inputs, the number of samples (in each of two groups) and the true correlation between
@@ -175,12 +176,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                     h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size, 
                                                     the true population mean and true standard deviation. We present from the left, the familiar 
                                                     nonparametric frequentist bootstrap percentile approach. 
-                                                    With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
+                                                    With the first Bayesian bootstrap method proceeds by drawing n-1 random uniform values between 0 and 1 
                                               and the n gap sizes are 
-                the weights for the calculation of a weighted mean, this process is repeated a large number of times.
+                the weights for the calculation of a weighted mean, this process is repeated a large number of times, specified by the number of Monte Carlo simulations.
                                               
                                               
-                                              The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
+                                              The next Bayesian bootstrap distribution is generated using the Dirichlet distribution directly, with n draws from this distribution
                                               (the gaps between uniform random variables follow the Dirichlet distribution) to derive the weights for the calculation of a weighted mean.
                                                The result from a t-test is also provided below the plot. The true population value, the estimated median, 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
@@ -196,11 +197,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("2 Estimating correlation, simulated data", value=3, 
-                h4("In a seperate analysis we estimate correlation. Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
+                h4("In a separate analysis we estimate correlation. Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
                We present clockwise from top left, 
-                                              a Bayesian bootstrap approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
-                                              and the
-                                              n gap sizes are then the probability for inclusion in a bootstrap sample, for which correlation is then estimated. The next approach 
+                                              a Bayesian bootstrap approach which proceeds by drawing n-1 random uniform values between 0 and 1 
+                                              and the n gap sizes are 
+                the weights applied to the data for the calculation estimating correlation. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
                     We use the Fisher z transformation to plot each distribution [4]. The true population value, the estimated median, 2.5 and 97.5 are presented for each distribution."),
                 h4(paste("Figure 2. Bayesian and frequentist bootstrap distributions, estimating correlation")), 
@@ -483,7 +484,7 @@ server <- shinyServer(function(input, output   ) {
       B <-  paste("Bayesian : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
       
       Ce<-  est <- quantile(C, c(.025,.5,.975))  
-      C <-  paste("Bayesian2 : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
+      C <-  paste("Bayesian [2] : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
       
         #make a dataset to add lines to ggplot facets
       
