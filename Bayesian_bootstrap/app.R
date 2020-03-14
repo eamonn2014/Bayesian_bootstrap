@@ -54,10 +54,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                     direction = "bottom"
                 ),
                 
-                h2("The Bayesian Bootstrap (philosophic numbers smooth)"),
+                h2("The Bayesian Bootstrap (philosophic numbers smooth)"), 
                 
                 h4("There is a Bayesian analogue of the familiar frequentist bootstrap! [1]. We investigate the Bayesian bootstrap using functions coded up by me and 
-                functions from R packages. We also run a frequentist bootstrap. We look at (i) estimating a mean from one sample from a normal distribution and 
+                functions from R packages. We also run a frequentist nonparametric bootstrap appriach. We look at (i) estimating a mean from one sample from a normal distribution and 
                 (ii) estimating a correlation coefficient between two groups of samples. In the case of the one sample mean, n-1 uniform samples are drawn and the size of the n gaps then become 
                 the probabilities for incorporation of the original n samples into the boostrap sample [2]. On the third tab we also use a published dataset to estimate correlation [1]. 
                 An observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with respect to the resulting 
@@ -153,8 +153,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("1 Estimating a one sample mean", value=7, 
                                            
-                                                    h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size and 
-                                                    the true population mean and standard deviation. We present from the left, the familiar frequentist bootstrap approach. 
+                                                    h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size, 
+                                                    the true population mean and true standard deviation. We present from the left, the familiar 
+                                                    nonparametric frequentist bootstrap percentile approach. 
                                                     With the first Bayesian bootstrap approach samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 
                                               and the n gap sizes are then the probability for inclusion of the original samples into a bootstrap sample, the mean is then estimated. 
                                               The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
