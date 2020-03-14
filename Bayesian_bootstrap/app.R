@@ -360,8 +360,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
 server <- shinyServer(function(input, output   ) {
     
-    shinyalert("The Bayesian bootstrap!",
-               "And it's pretty...pretty...pretty...cool",
+    shinyalert("Welcome! \nExplore the Bayesian bootstrap!",
+               "It's pretty...pretty...pretty...cool",
                type = "info")
   
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
