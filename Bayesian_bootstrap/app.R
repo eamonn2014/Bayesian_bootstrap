@@ -54,15 +54,17 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                     direction = "bottom"
                 ),
                 
-                h2("The Bayesian Bootstrap (philosophic numbers smooth)"), 
+                h2("The Bayesian Bootstrap (philosophic numbers smooth)*"), 
                 
-                h4("There is a Bayesian analogue of the familiar frequentist bootstrap! [1]. We investigate the Bayesian bootstrap using functions coded up by me and 
-                functions from R packages. We also run a frequentist nonparametric bootstrap appriach. We look at (i) estimating a mean from one sample from a normal distribution and 
-                (ii) estimating a correlation coefficient between two groups of samples. In the case of the one sample mean, n-1 uniform samples are drawn and the size of the n gaps then become 
-                the probabilities for incorporation of the original n samples into the boostrap sample [2]. On the third tab we also use a published dataset to estimate correlation [1]. 
-                An observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with respect to the resulting 
+                h4("I assume some familiarity with statistics and bootstrapping [1]. There is a Bayesian analogue of the familiar frequentist bootstrap! [2,3]. We investigate the Bayesian bootstrap using functions coded up by me and 
+                functions from R packages. We also run a frequentist nonparametric bootstrap approach. We look at (i) estimating a mean from one sample from a normal distribution and 
+                (ii) estimating a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds by drawing n-1 uniform samples, 
+                the size of the n gaps between the uniform draws
+                then become 
+                the probabilities for incorporation of the original n samples into the boostrap sample [2]. The parameter is then calculated from the bootstrap sample and the process repeated a large number of times. On the third tab we also use a published dataset to estimate correlation [3]. 
+                An (unverified) observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with 'respect to the resulting 
                 inferences about parameters is that 
-                the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters.
+                the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters' [2].
 
               "), 
                 
@@ -96,36 +98,43 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       tags$head(
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
-                                     # h4("------------------------------------All tabs------------------------------------"),
+                                     # h4("------------------------------------All tabs------------------------------------"), 
                                       textInput('sims', 
-                                                div(h5("Monte Carlo simulations (all tabs)")), "1000"),
+                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (tabs 1-3)"))), "1000"),
+                                      
                                       #h4("------------------------------------tab 2 inputs only-------------------------"),
                                       textInput('vec3', 
-                                                div(h5("Number of samples for mean (tab 1)")), "100"),
+                                              #  div(h5("Number of samples for mean (tab 1)")), "100"),
+                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (tab 1 only)"))), "100"),
                                       
                                       textInput('vec4', 
-                                                div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
+                                           #     div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
+                                     div(h5(tags$span(style="color:blue", "Enter the true mean and sd for a normal distribution (tab 1 only)"))), "10, 5"),
                                       #h4("------------------------------------tab 3 inputs only-------------------------"),
                                       textInput('n1y1', 
-                                                div(h5("Number of samples for Correlation (tab 2)")), "10"),
-                                      
+                                             #   div(h5("Number of samples for Correlation (tab 2)")), "10"),
+                                     div(h5(tags$span(style="color:blue", "Number of samples for Correlation (tab 2 only)"))), "10"),
                                       textInput('n2y2', 
-                                                div(h5("Enter the true correlation (tab 2)")), ".8"),
+                                          #      div(h5("Enter the true correlation (tab 2)")), ".8"),
+                                     div(h5(tags$span(style="color:blue", "Enter the true correlation (tab 2 only)"))), "0.8"),
+                                  
                                       #h4("-----------------------------------------------------------------------------------"),
                                  
                                       div(h5("References:")),  
-                                      
-                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", "[1] Efron's paper"),
+                                     tags$a(href = "https://en.wikipedia.org/wiki/Bootstrapping_%28statistics%29", tags$span(style="color:blue", "[1] Bootstrap wiki"),),   
+                                     div(p(" ")),
+                                     tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338",  tags$span(style="color:blue", "[2] Rubin 1981"),),   
+                                     div(p(" ")),
+                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", tags$span(style="color:blue", "[3] Efron 1977"),),
                                       div(p(" ")),
-                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338", "[2] Rubin's paper"),
+                                     
+                                      tags$a(href = "https://blogs.sas.com/content/iml/2017/09/20/fishers-transformation-correlation.html", tags$span(style="color:blue", "[4] Fisher's z transformation"),),  
                                       div(p(" ")),
-                                      tags$a(href = "https://blogs.sas.com/content/iml/2017/09/20/fishers-transformation-correlation.html", "[3] Fisher's z transformation"),
-                                      div(p(" ")),
-                                      # tags$a(href = "https://www.tjmahr.com/bayesian-fisher-exact-test/", "[4] Blog article"),
-                                      # div(p(" ")),
-
+                                     tags$a(href = "https://en.wikisource.org/wiki/Keats;_poems_published_in_1820/Bards_of_Passion_and_of_Mirth", tags$span(style="color:blue", "* The cockney poet"),),  
+                                     div(p(" ")),
+                                     
                                   )
-                                  
+                                
                     ),
                     
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tab panels
@@ -160,13 +169,13 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               and the n gap sizes are then the probability for inclusion of the original samples into a bootstrap sample, the mean is then estimated. 
                                               The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
                                               (the gaps between uniform random variables follow the Dirichlet distribution) to derive the probability of inclusion.
-                                               The result from a t-test is also provided in the table. The median and 2.5 and 97.5 percentiles are presented for each distribution."),
+                                               The result from a t-test is also provided below the plot. The true population value, the estimated median, 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
                                            h4(paste("Figure 1. Bayesian and frequentist bootstrap distributions, estimating one sample mean")), 
                                            div(plotOutput("diff", width=fig.width4, height=fig.height4)),       
                                             
                                            fluidRow(
-                                               column(width = 5, offset = 0, style='padding:1px;',
+                                               column(width = 7, offset = 0, style='padding:1px;',
                                                       h4("T-test mean and 95% confidence interval"), 
                                                       div( verbatimTextOutput("reg.summary2"))
                                                )),
@@ -180,7 +189,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               and the
                                               n gap sizes are then the probability for inclusion in a bootstrap sample, for which correlation is then estimated. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
-                    We use the Fisher z transformation to plot each distribution. The median and 2.5 and 97.5 percentiles are presented for each distribution."),
+                    We use the Fisher z transformation to plot each distribution [4]. The true population value, the estimated median, 2.5 and 97.5 are presented for each distribution."),
                 h4(paste("Figure 2. Bayesian and frequentist bootstrap distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
@@ -188,7 +197,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("3 Estimating correlation using Efron's dataset", value=3, 
                                            h4("We use the dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
-                                              of 9 samples [1]. Figure 1 in the paper is very similar to the frequentist histogram here.
+                                              of 9 samples [3]. Figure 1 in the paper is very similar in shape to the frequentist histogram here (the data are printed in the figure footnote [3]).
                                               We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
                                               an approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1 and the
@@ -409,7 +418,7 @@ server <- shinyServer(function(input, output   ) {
       
       g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
                       #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
-                      caption = "The dotted lines indicate the median and 2.5 and 97.5 percentiles, the red line is the true population mean" 
+                      caption = "The dotted lines indicate the median, 2.5 and 97.5 percentiles, the red line is the true population value" 
         ) 
       
       print(g0)
@@ -800,6 +809,12 @@ server <- shinyServer(function(input, output   ) {
                        panel.background = element_blank(), 
                        axis.line = element_line(colour = "black")
                        )
+      
+      g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
+        #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+        caption = "The dotted lines indicate the median, 2.5 and 97.5 percentiles, the red line is the true population value" 
+      ) 
+      
         print(g0)
         
     })
@@ -940,6 +955,11 @@ server <- shinyServer(function(input, output   ) {
             panel.background = element_blank(), 
             axis.line = element_line(colour = "black")
           )
+          
+          g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
+            #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+            caption = "The lines indicate the median, 2.5 and 97.5 percentiles" 
+          ) 
           print(g0)
           
           
