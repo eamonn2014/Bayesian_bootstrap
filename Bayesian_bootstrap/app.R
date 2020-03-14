@@ -32,7 +32,8 @@ fig.height4 <- 450
 
 fig.width5 <- 1380
 fig.height5 <- 600
-
+fig.width6 <- 900
+fig.height6 <- 550
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p2 <- function(x) {formatC(x, format="f", digits=2)}
 p3 <- function(x) {formatC(x, format="f", digits=3)}
@@ -252,10 +253,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                          
                          h4(("Example data sets (download either file and click 'Browse...' to locate and upload for analysis):")) ,
                          
-                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", tags$span(style="color:blue", "Example 2"),), 
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/icreamsales", tags$span(style="color:blue", "Example 1 Ice cream sale and temperature"),), 
                          div(p(" ")),
                          
-                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda%20B%20rep%20only", tags$span(style="color:blue", "Example 1"),), 
+                         tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/height.selfesteem", tags$span(style="color:blue", "Example 2 height and self esteem"),), 
                          div(p(" ")),
                          
                          sidebarLayout(
@@ -316,7 +317,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              
                              # Output: Data file ----
                              
-                             div(plotOutput("contents2", width=fig.width5, height=fig.height5)),
+                             div(plotOutput("contents2", width=fig.width6, height=fig.height6)),
                              #div(verbatimTextOutput("contents2")),
                              #plotOutput("plotx"),
                              tags$hr(),
@@ -1137,7 +1138,7 @@ server <- shinyServer(function(input, output   ) {
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # analyse user data
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        output$contents2 <- renderPrint({
+        output$contents2 <- renderPlot({   
           
           sample <- random.sample()
           reps <- sims <- sample$sims
