@@ -57,14 +57,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h2("The Bayesian Bootstrap (philosophic numbers smooth)*"), 
                 
-                h4("I assume some familiarity with statistics and bootstrapping [1]. There is a Bayesian analogue of the familiar frequentist bootstrap! [2,3]. We investigate the Bayesian bootstrap using functions coded up by me and 
+                h4("I assume some familiarity with statistics and bootstrapping [1]. There is a Bayesian analogue of the familiar frequentist bootstrap [2,3]. We investigate the Bayesian bootstrap using functions
+                coded up and 
                 functions from R packages. We also run a frequentist nonparametric bootstrap approach. We look at (i) estimating a mean from one sample from a normal distribution and 
                 (ii) estimating a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds by drawing n-1 uniform samples, 
                 the size of the n gaps between the uniform draws
                 then become 
-                the weights for the calculation, hence the smoothness* generally of the Bayesian distibution in comparison to the frequentist. 
+                the weights for the calculation, hence the smoothness* of the Bayesian distibution generally in comparison with the frequentist. 
                 This process is repeated a large number of times. 
-               On the third tab we also use a published dataset to estimate correlation [3]. 
+               On the third tab we also use a published dataset to estimate correlation [3]. The fifth tab allows a correlation analysis of your own data.
                  A more general advantage of the Bayesian bootstrap with 'respect to the resulting 
                 inferences about parameters is that 
                 the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters' [2].
@@ -91,7 +92,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   The next two inputs impact only tab 1, the number of samples and
                                      the true mean and standard deviation. Tab 2 estimates the uncertainty in a correlation 
                                      coefficient and the last two inputs, the number of samples (in each of two groups) and the true correlation between
-                                     the two groups come into play here. The fouth tab presents the published data."),
+                                     the two groups come into play here. The fourth tab presents the published data."),
                                   div(
                                       
                                       tags$head(
@@ -101,10 +102,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                       tags$head(
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
+                                
                                      # h4("------------------------------------All tabs------------------------------------"), 
                                       textInput('sims', 
                                                 div(h5(tags$span(style="color:blue", "Monte Carlo simulations (tabs 1-3)"))), "5000"),
-                                      
+                                     tags$hr(),
                                       #h4("------------------------------------tab 2 inputs only-------------------------"),
                                       textInput('vec3', 
                                               #  div(h5("Number of samples for mean (tab 1)")), "100"),
@@ -114,13 +116,14 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                            #     div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
                                      div(h5(tags$span(style="color:blue", "Enter the true mean and sd for a normal distribution (tab 1 only)"))), "10, 5"),
                                       #h4("------------------------------------tab 3 inputs only-------------------------"),
-                                      textInput('n1y1', 
+                                     tags$hr(), 
+                                     textInput('n1y1', 
                                              #   div(h5("Number of samples for Correlation (tab 2)")), "10"),
                                      div(h5(tags$span(style="color:blue", "Number of samples for Correlation (tab 2 only)"))), "10"),
                                       textInput('n2y2', 
                                           #      div(h5("Enter the true correlation (tab 2)")), ".8"),
                                      div(h5(tags$span(style="color:blue", "Enter the true correlation (tab 2 only)"))), "0.8"),
-                                  
+                                     tags$hr(),
                                       #h4("-----------------------------------------------------------------------------------"),
                                  
                                       div(h5("References:")),  
@@ -136,7 +139,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      tags$a(href = "https://en.wikisource.org/wiki/Keats;_poems_published_in_1820/Bards_of_Passion_and_of_Mirth", tags$span(style="color:blue", "* The cockney poet"),),  
                                      div(p(" ")),
                                      
+                                     
+                                     tags$hr()
                                   )
+                                  
                                 
                     ),
                     
@@ -188,8 +194,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                    ) ,
                         
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                  tabPanel("2 Estimating correlation using simulated data", value=3, 
-                h4("Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
+                                  tabPanel("2 Estimating correlation, simulated data", value=3, 
+                h4("In a seperate analysis we estimate correlation. Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
                We present clockwise from top left, 
                                               a Bayesian bootstrap approach in which n paired samples are selected with replacement by drawing n-1 random uniform values between 0 and 1
                                               and the
@@ -209,8 +215,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                                   ),
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                  tabPanel("3 Estimating correlation using Efron's dataset", value=3, 
-                                           h4("We use the dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
+                                  tabPanel("3 Estimating correlation, Efron's dataset", value=3, 
+                                           h4("We estimate correlation again but use a dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
                                               of 9 samples [3]. Figure 1 in the paper is very similar in shape to the frequentist histogram here (the data are printed in the figure footnote [3]).
                                               We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
@@ -245,13 +251,14 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NEW
-                tabPanel("5 Upload data for analysis", fluid = TRUE, width = 4,
+                tabPanel("5 Upload data for correlation analysis", fluid = TRUE, width = 4,
                          
-                         h4(("Upload your own data for analysis. The top two radio button options are to help load,
-                                 the bottom two options are to either show the top six rows of the data or show all the data.
+                         h4(("Upload your own data for correlation analysis. Requires 2 columns of numeric data. Select 'header' if your data columns have names. 
+                         The top two radio button options are to help load,
+                                 the bottom option is to either print the top six rows of the data or show all the data.
                                ")) ,
                          
-                         h4(("Example data sets (download either file and click 'Browse...' to locate and upload for analysis):")) ,
+                         h4(("Here are two example data sets (download either file and click 'Browse...' to locate and upload for the analysis):")) ,
                          
                          tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/icreamsales", tags$span(style="color:blue", "Example 1 Ice cream sale and temperature"),), 
                          div(p(" ")),
@@ -302,7 +309,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                           selected = "head"),
                              
                              # Horizontal line ----
-                             tags$hr(),
+                             # tags$hr(),
                              
                              # Input: Select number of rows to display ----
                              # radioButtons("what", "Output",
@@ -351,8 +358,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
 server <- shinyServer(function(input, output   ) {
     
-    shinyalert("You better believe it, there's a Bayesian bootstrap!",
-               "And it's pretty, pretty, pretty smooth",
+    shinyalert("There's a Bayesian bootstrap!",
+               "And it's pretty...pretty...pretty...smooth",
                type = "info")
   
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
