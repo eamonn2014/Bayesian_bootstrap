@@ -171,9 +171,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               and the n gap sizes are 
                 the weights for the calculation of a weighted mean, this process is repeated a large number of times.
                                               
-                                              . 
+                                              
                                               The next Bayesian bootstrap distribution is generated using the Dirichlet distribution with n draws from this distribution
-                                              (the gaps between uniform random variables follow the Dirichlet distribution) to derive the probability of inclusion.
+                                              (the gaps between uniform random variables follow the Dirichlet distribution) to derive the weights for the calculation of a weighted mean.
                                                The result from a t-test is also provided below the plot. The true population value, the estimated median, 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
                                            h4(paste("Figure 1. Bayesian and frequentist bootstrap distributions, estimating one sample mean")), 
@@ -434,7 +434,11 @@ server <- shinyServer(function(input, output   ) {
         res <- rbind(A1,B1,C1,D1)
         rownames(res) <- NULL
         
-        res <- res[4,]
+        res <- as.numeric(res[4,2:4])
+        
+        names(res) <- c("Estimate","Lower","Upper")
+        rownames(res) <- NULL
+        
         
         return(list(res=res , A=A, B=B, C=C , mu1=mu1)) 
         
@@ -617,7 +621,7 @@ server <- shinyServer(function(input, output   ) {
       
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # correlation Efrom data
+    # correlation Efron data
     output$reg.summary4 <- renderPrint({
       
       return(print(ruben()$z2, digits=4))
