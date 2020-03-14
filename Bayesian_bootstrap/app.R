@@ -60,7 +60,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h4("I assume some familiarity with statistics and bootstrapping [1]. We explore the Bayesian analogue 
                 of the more familiar frequentist bootstrap [2,3]. We proceed using functions
                 coded up and 
-                functions from R packages. We include to the frequentist nonparametric bootstrap approach. We (i) estimate a mean from one sample from a normal distribution and 
+                functions from R packages. We include too the frequentist nonparametric bootstrap approach. We (i) estimate a mean from one sample from a normal distribution and 
                 (ii) estimate a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds
                 by drawing n-1 uniform samples, 
                 the size of the n gaps between the uniform draws
