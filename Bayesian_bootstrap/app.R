@@ -59,7 +59,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h4("There is a Bayesian analogue of the familiar frequentist bootstrap! [1]. We investigate the Bayesian bootstrap using functions coded up by me and 
                 functions from R packages. We also run a frequentist bootstrap. We look at (i) estimating a mean from one sample from a normal distribution and 
                 (ii) estimating a correlation coefficient between two groups of samples. In the case of the one sample mean, n-1 uniform samples are drawn and the size of the n gaps then become 
-                the probabilities for incorporation of the original n samples into the boostrap sample [2]. On the third tabWe also use a published dataset to estimate correlation [1]. 
+                the probabilities for incorporation of the original n samples into the boostrap sample [2]. On the third tab we also use a published dataset to estimate correlation [1]. 
                 An observation with this app. is that the Bayesian approach works better with small samples. A more general advantage of the Bayesian bootstrap with respect to the resulting 
                 inferences about parameters is that 
                 the Bayesian approach generates likelihood statements about parameters, rather than frequency statements about statistics under assumed values for parameters.
