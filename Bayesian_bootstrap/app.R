@@ -431,10 +431,9 @@ server <- shinyServer(function(input, output   ) {
         rownames(res) <- NULL
         
         res <- as.numeric(res[4,2:4])
-        
-        names(res) <- c("Estimate","Lower","Upper")
+        res  <- c(y$parameter+1, res)
+        names(res) <- c("N","Estimate","Lower","Upper")
         rownames(res) <- NULL
-        
         
         return(list(res=res , A=A, B=B, C=C , mu1=mu1)) 
         
@@ -530,8 +529,8 @@ server <- shinyServer(function(input, output   ) {
         axis.line = element_line(colour = "black")
       )
       
-      g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
-                      #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+      g0 <- g0 + labs(#title = " ",
+                      #subtitle = " ",
                       caption = "The dotted lines indicate the median, 2.5 and 97.5 percentiles, the red line is the true population value" 
         ) 
       
@@ -649,8 +648,15 @@ server <- shinyServer(function(input, output   ) {
         
         z <- CorrNorm(n=n,rho=r)
         z1 <- cor.test(z[,1],z[,2])
-        z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
-        names(z1) <- c("Estimate","Lower","Upper")
+        # z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+        # names(z1) <- c("Estimate","Lower","Upper")
+        
+        
+        xx <- as.integer(as.vector(z1$parameter)+2) 
+        z1 <- c( (xx), unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+        names(z1) <- c("N","Estimate","Lower","Upper")
+        
+        
         
         data.set <- data.frame(z[,1],z[,2])
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -954,11 +960,12 @@ server <- shinyServer(function(input, output   ) {
           data.set <- data.frame(dye,efp)
           
           z1 <- cor.test(dye,efp)
-          z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
-          names(z1) <- c("Estimate","Lower","Upper")
-          
-          return(list(data.set=data.set, z2=z1)) 
+          xx <- as.integer(as.vector(z1$parameter)+2) 
+          z1 <- c( (xx), unlist(z1$estimate), unlist(z1$conf.int)[1:2])
+          names(z1) <- c("N","Estimate","Lower","Upper")
 
+          return(list(data.set=data.set, z2=z1)) 
+          
         })
 
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
