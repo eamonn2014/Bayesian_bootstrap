@@ -20,9 +20,9 @@ options(max.print=1000000)
 fig.width <- 400
 fig.height <- 300
 fig.width2 <- 1400
-fig.height2 <- 300#50
+fig.height2 <- 300
 fig.width3 <- 1400  
-fig.height3 <- 600#400
+fig.height3 <- 600
 fig.width4 <- 1380
 fig.height4 <- 450
 fig.width5 <- 1380
