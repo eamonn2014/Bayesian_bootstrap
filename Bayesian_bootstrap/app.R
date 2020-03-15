@@ -38,8 +38,6 @@ options(width=200)
 set.seed(12345) # reproducible
 
 is.even <- function(x){ x %% 2 == 0 } # function to id. odd maybe useful
-
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 # paper
