@@ -4,13 +4,9 @@
 rm(list=ls())
 library(ggplot2)
 library(shiny) 
-#require(LearnBayes)
-#library(tidyverse)
 library(shinyWidgets)
 library(shinythemes)  # more funky looking apps
-#library(rstan)
 library(DT)
-#require(rms) # freq logistic regression
 library(shinyalert)
 library(gtools)
 library(Hmisc)
@@ -18,7 +14,7 @@ library(scales)
 library(LaplacesDemon)
 library(bayesboot)
 library(boot)
- #options(mc.cores = parallel::detectCores())
+#options(mc.cores = parallel::detectCores())
 #rstan_options(auto_write = TRUE)
 options(max.print=1000000)
 fig.width <- 400
@@ -29,7 +25,6 @@ fig.width3 <- 1400
 fig.height3 <- 600#400
 fig.width4 <- 1380
 fig.height4 <- 450
-
 fig.width5 <- 1380
 fig.height5 <- 600
 fig.width6 <- 900
@@ -58,14 +53,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h2("The Bayesian Bootstrap (philosophic numbers smooth)*"), 
                 
                 h4("I assume some familiarity with statistics and bootstrapping [1]. We explore the Bayesian analogue 
-                of the more familiar frequentist bootstrap [2,3]. We proceed using functions
+                of the more familiar frequentist bootstrap and proceed using functions
                 coded up and 
-                functions from R packages. We include too the frequentist nonparametric bootstrap approach. We (i) estimate a mean from one sample from a normal distribution and 
-                (ii) estimate a correlation coefficient between two groups of samples. Where n is the sample size, the Bayesian bootstrap proceeds
+                functions from R packages [2,3]. Included too is the frequentist nonparametric bootstrap approach. We (i) estimate a mean from 
+                one sample from a normal distribution (tab 1) and 
+                (ii) estimate a correlation coefficient between two groups of samples (other tabs). In the case of estimating a one sample mean, if n is the sample size, the Bayesian bootstrap proceeds
                 by drawing n-1 uniform samples, 
                 the size of the n gaps between the uniform draws
                 are the
-                the weights for the calculation, hence the smoothness* of the Bayesian distibution generally in comparison with the frequentist. 
+                the weights for the calculation, hence the smoothness* of the Bayesian distribution generally in comparison with the frequentist. 
                 This process is repeated a large number of times. 
                On the third tab we also use a published dataset to estimate correlation [3]. The fifth tab allows a correlation analysis of your own data.
                  A more general advantage of the Bayesian bootstrap with 'respect to the resulting 
@@ -87,7 +83,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   actionButton(inputId='ab1', label="R code",   icon = icon("th"),   
                                                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Bayesian_bootstrap/master/Bayesian_bootstrap/app.R', '_blank')"),    
                                   actionButton("resample", "Rerun the Monte Carlo simulation"),
-                                  br(), # br(), 
+                                  br(),  
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
                                   h4("The first input below is the number of Monte Carlo simulations which impacts tabs 1,2, 3 and 5. 
@@ -105,43 +101,37 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                           tags$style(HTML('#resample{background-color:orange}'))
                                       ),
                                 
-                                     # h4("------------------------------------All tabs------------------------------------"), 
                                       textInput('sims', 
-                                                div(h5(tags$span(style="color:blue", "Monte Carlo simulations (used on tabs 1,2,3 & 5)"))), "5000"),
-                                     tags$hr(),
-                                      #h4("------------------------------------tab 2 inputs only-------------------------"),
+                                      div(h5(tags$span(style="color:blue", "Monte Carlo simulations (used on tabs 1,2,3 & 5)"))), "5000"),
+                                      tags$hr(),
+                                     
                                       textInput('vec3', 
-                                              #  div(h5("Number of samples for mean (tab 1)")), "100"),
-                                     div(h5(tags$span(style="color:blue", "Number of samples for mean (used on tab 1 only)"))), "5"),
+                                      div(h5(tags$span(style="color:blue", "Number of samples for mean (used on tab 1 only)"))), "5"),
                                       
                                       textInput('vec4', 
-                                           #     div(h5("Enter the true mean and sd for a normal distribution (tab 1)")), "10, 5"),
-                                     div(h5(tags$span(style="color:blue", "Enter the true mean and sd for a normal distribution (used on tab 1 only)"))), "10, 5"),
-                                      #h4("------------------------------------tab 3 inputs only-------------------------"),
-                                     tags$hr(), 
-                                     textInput('n1y1', 
-                                             #   div(h5("Number of samples for Correlation (tab 2)")), "10"),
-                                     div(h5(tags$span(style="color:blue", "Number of samples for Correlation (used on tab 2 only)"))), "10"),
+                                      div(h5(tags$span(style="color:blue", "Enter true mean & sd for a normal distribution (used on tab 1 only)"))), "10, 5"),
+                                      tags$hr(), 
+                                     
+                                      textInput('n1y1', 
+                                     #   div(h5("Number of samples for Correlation (tab 2)")), "10"),
+                                      div(h5(tags$span(style="color:blue", "Number of samples for Correlation (used on tab 2 only)"))), "10"),
+                                     
                                       textInput('n2y2', 
-                                          #      div(h5("Enter the true correlation (tab 2)")), ".8"),
+                                     #      div(h5("Enter the true correlation (tab 2)")), ".8"),
                                      div(h5(tags$span(style="color:blue", "Enter the true correlation (used on tab 2 only)"))), "0.8"),
                                      tags$hr(),
-                                      #h4("-----------------------------------------------------------------------------------"),
-                                 
-                                      div(h5("References:")),  
+
+                                     div(h5("References:")),  
                                      tags$a(href = "https://en.wikipedia.org/wiki/Bootstrapping_%28statistics%29", tags$span(style="color:blue", "[1] Bootstrap wiki"),),   
                                      div(p(" ")),
                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176345338",  tags$span(style="color:blue", "[2] Rubin 1981"),),   
                                      div(p(" ")),
-                                      tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", tags$span(style="color:blue", "[3] Efron 1977"),),
-                                      div(p(" ")),
-                                     
-                                      tags$a(href = "https://blogs.sas.com/content/iml/2017/09/20/fishers-transformation-correlation.html", tags$span(style="color:blue", "[4] Fisher's z transformation"),),  
-                                      div(p(" ")),
+                                     tags$a(href = "https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552", tags$span(style="color:blue", "[3] Efron 1977"),),
+                                     div(p(" ")),
+                                     tags$a(href = "https://blogs.sas.com/content/iml/2017/09/20/fishers-transformation-correlation.html", tags$span(style="color:blue", "[4] Fisher's z transformation"),),  
+                                     div(p(" ")),
                                      tags$a(href = "https://en.wikisource.org/wiki/Keats;_poems_published_in_1820/Bards_of_Passion_and_of_Mirth", tags$span(style="color:blue", "* The cockney poet"),),  
                                      div(p(" ")),
-                                     
-                                     
                                      tags$hr()
                                   )
                                   
@@ -167,21 +157,18 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             .navbar-default .navbar-nav > li > a[data-value='t1'] {color: red;background-color: pink;}
                             .navbar-default .navbar-nav > li > a[data-value='t2'] {color: blue;background-color: lightblue;}
                             .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
-
                    ")),
                                   
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("1 Estimating a one sample mean", value=7, 
-                                           
                                                     h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size, 
                                                     the true population mean and true standard deviation. We present from the left, the familiar 
                                                     nonparametric frequentist bootstrap percentile approach. 
                                                     With the first Bayesian bootstrap method proceeds by drawing n-1 random uniform values between 0 and 1 
-                                              and the n gap sizes are 
-                the weights for the calculation of a weighted mean, this process is repeated a large number of times, specified by the number of Monte Carlo simulations.
-                                              
-                                              
-                                              The next Bayesian bootstrap distribution is generated using the Dirichlet distribution directly, with n draws from this distribution
+                                                    and the n gap sizes are 
+                the weights for the calculation of a weighted mean, this process is repeated a large number of times, 
+                specified by the number of Monte Carlo simulations.
+                The next Bayesian bootstrap distribution is generated using the Dirichlet distribution directly, with n draws from this distribution
                                               (the gaps between uniform random variables follow the Dirichlet distribution) to derive the weights for the calculation of a weighted mean.
                                                The result from a t-test is also provided below the plot. The true population value, the estimated median, 2.5 and 97.5 percentiles are presented for each distribution."),
                                                     
@@ -197,13 +184,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("2 Estimating correlation, simulated data", value=3, 
-                h4("In a separate analysis we estimate correlation. Using the the inputs left we can specify the number of Monte Carlo simulations, the sample size and the true population correlation.
-               We present clockwise from top left, 
-                                              a Bayesian bootstrap approach which proceeds by drawing n-1 random uniform values between 0 and 1 
+                h4("In a separate analysis we estimate correlation. Using the the inputs left we can specify the number of Monte Carlo simulations, 
+                the sample size and the true population correlation.
+               We present clockwise from top left,a Bayesian bootstrap approach which proceeds by drawing n-1 random uniform values between 0 and 1 
                                               and the n gap sizes are 
                 the weights applied to the data for the calculation estimating correlation. The next approach 
-                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package. 
-                    We use the Fisher z transformation to plot each distribution [4]. The true population value, the estimated median, 2.5 and 97.5 are presented for each distribution."),
+                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function 
+                                              in the bayesboot package. 
+                    We use the Fisher z transformation to plot each distribution [4]. The true population value, the estimated median, 
+                   2.5 and 97.5 are presented for each distribution."),
                 h4(paste("Figure 2. Bayesian and frequentist bootstrap distributions, estimating correlation")), 
                                            div(plotOutput("diff3", width=fig.width5, height=fig.height5)),
                                            
@@ -219,12 +208,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("3 Estimating correlation, Efron's dataset", value=3, 
                                            h4("We estimate correlation again but use a dataset quoted in Efron's bootstrap paper, a small dataset of two groups, each
-                                              of 9 samples [3]. Figure 1 in the paper is very similar in shape to the frequentist histogram here (the data are printed in the figure footnote [3]).
+                                              of 9 samples [3]. Figure 1 in the paper is very similar in shape to the frequentist histogram 
+                                              here (the data are printed in the figure footnote [3]).
                                               We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
-                                              an approach in which n paired samples are analysed first by drawing 8 random uniform values between 0 and 1 and the
+                                              an approach in which n paired samples are analysed first by drawing 8 random uniform values 
+                                              between 0 and 1 and the
                                               9 gap sizes are then the weights used to calculate correlation. The next approach 
-                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly the function in the bayesboot package.
+                                              is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly
+                                              the function in the bayesboot package.
                                                   The median and 2.5 and 97.5 percentiles are presented for each distribution."),
                                            h4(paste("Figure 3. Bayesian and frequentist bootstrap distributions, estimating correlation")),  
                                            div(plotOutput("diff4", width=fig.width5, height=fig.height5)),
@@ -255,7 +247,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NEW
                 tabPanel("5 Upload data for correlation analysis", fluid = TRUE, width = 4,
                          
-                         h4(("Upload your own data for correlation analysis. Requires 2 columns of numeric data. Select 'header' if your data columns have names. 
+                         h4(("Upload your own data for correlation analysis. Requires 2 columns of numeric data. Select 'Header' 
+                         if your data columns have names. 
                          The top two radio button options are to help load,
                                  the bottom option is to either print the top six rows of the data or show all the data.
                                ")) ,
@@ -340,20 +333,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                            ),
                          )
                 ) 
-                
-                
-                
-                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   END NEW   
-                
-                
-                
-                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   END NEW   
                         )
                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     )
                  ) 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end tab panels 
-                
 )
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -361,7 +346,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 server <- shinyServer(function(input, output   ) {
     
     shinyalert("Welcome! \nExplore the Bayesian bootstrap!",
-               "It's pretty...pretty...pretty...cool",
+               "It's pretty...pretty...pretty...good",
                type = "info")
   
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -486,7 +471,7 @@ server <- shinyServer(function(input, output   ) {
       Ce<-  est <- quantile(C, c(.025,.5,.975))  
       C <-  paste("Bayesian [2] : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")") 
       
-        #make a dataset to add lines to ggplot facets
+      # make a dataset to add lines to ggplot facets
       
       dummy2 <- data.frame(X2=c(paste("",A),
                                 paste("",B),
@@ -504,9 +489,8 @@ server <- shinyServer(function(input, output   ) {
       )
       
        r <-  mu1+5* sd1
-       p <-  seq(-r, r, sd1/n) #(r--r)/10)
+       p <-  seq(-r, r, sd1/n) 
       
-       #library(scales)
       g0 <- ggplot(data=foo1, aes(x = value)) +#
         geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
         geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -520,7 +504,6 @@ server <- shinyServer(function(input, output   ) {
       g0 <- g0  + scale_x_continuous(breaks= p, 
                                      xlab("Mean"),
                                      oob=discard) +
-        #xlim(-Inf,Inf) +
         scale_y_continuous(breaks = NULL) +
         
         theme_bw()  
@@ -647,8 +630,6 @@ server <- shinyServer(function(input, output   ) {
       return(print(usercor()$z1, digits=4))
       
     })
-    
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # run the correlation analysis for tab 2
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -671,7 +652,6 @@ server <- shinyServer(function(input, output   ) {
         z <- CorrNorm(n=n,rho=r)
         z1 <- cor.test(z[,1],z[,2])
         z1 <- c(unlist(z1$estimate), unlist(z1$conf.int)[1:2])
-        #z1 <- data.frame(z1)
         names(z1) <- c("Estimate","Lower","Upper")
         
         data.set <- data.frame(z[,1],z[,2])
@@ -685,13 +665,10 @@ server <- shinyServer(function(input, output   ) {
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         X <- matrix(c(z[,1],z[,2]), length(z[,1]), 2)
-        #library(LaplacesDemon)
         BB <- BayesianBootstrap(X=X, n=sims,
                                 Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        #library(bayesboot)
         # Using the weighted correlation (corr) from the boot package.
-        #library(boot)
         b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
@@ -705,12 +682,11 @@ server <- shinyServer(function(input, output   ) {
     })
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #NOT USED REPLACED BY FACET PLOT
+    # NOT USED REPLACED BY FACET PLOT!!!!!!
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$diff2 <- renderPlot({         
-    
-        
+
         f <- cor1()$f
         b  <- cor1()$b
         BB <-cor1()$BB
@@ -734,7 +710,6 @@ server <- shinyServer(function(input, output   ) {
         lims <- unique(a[sapply(bz,function(x) which.min(abs(x-a)))])
         
         indx <- which(x %in% lims)
-        #limz <- x[indx[1]:indx[2]]
          i = indx[1]-1
          if (i %in% 0) {i=1} 
          j=  indx[2]+1
@@ -858,11 +833,7 @@ server <- shinyServer(function(input, output   ) {
                            #plot.margin = unit(c(1,1,1,1), "cm")
                            plot.title = element_text(size = 14)
         )
-        
-        
-        
-        
-        
+
         gridExtra::grid.arrange(pL1,  pL2, pL3,  pL4, nrow=2) 
         
     })
@@ -924,7 +895,6 @@ server <- shinyServer(function(input, output   ) {
          
         p <- sort(c(-.9, .9,-.99,.99 ,.999,.9999,1,-.95, .95,.8,-.8,seq(-.6,.6,0.3))  )
         
-       # library(scales)
        g0 <- ggplot(data=foo1, aes(x = value)) +#
           geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
           geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -940,7 +910,6 @@ server <- shinyServer(function(input, output   ) {
                                         breaks= p, 
                                         xlab("Correlation"),
                                         oob=discard) +
-            #xlim(-Inf,Inf) +
             scale_y_continuous(breaks = NULL) +
 
       theme_bw()  
@@ -969,8 +938,7 @@ server <- shinyServer(function(input, output   ) {
                        axis.line = element_line(colour = "black")
                        )
       
-      g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
-        #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+      g0 <- g0 + labs(
         caption = "The dotted lines indicate the median, 2.5 and 97.5 percentiles, the red line is the true population value" 
       ) 
       
@@ -1007,7 +975,6 @@ server <- shinyServer(function(input, output   ) {
           
           reps <- sims <- sample$sims
           
-         # library(LaplacesDemon)
           len <- length(data.set$dye)
           
             sboot <- function() {
@@ -1026,9 +993,7 @@ server <- shinyServer(function(input, output   ) {
           BB <- BayesianBootstrap(X=X, n=sims,
                                   Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
            
-         # library(bayesboot)
           # Using the weighted correlation (corr) from the boot package.
-        #  library(boot)
           b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
            
           
@@ -1059,7 +1024,6 @@ server <- shinyServer(function(input, output   ) {
           D <-   paste("bayesboot : Median",p3(est[2][[1]]),", 95%CI (", p3(est[1][[1]]) ,", ",  p3(est[3][[1]]) ,")")  
           
           # make a dataset to add lines to ggplot facets
-          
           dummy2 <- data.frame(X2=c(paste("",A),
                                     paste("",B),
                                     paste("",C),
@@ -1077,7 +1041,6 @@ server <- shinyServer(function(input, output   ) {
           )
           
           p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
-          #library(scales)
           g0 <- ggplot(data=foo1, aes(x = value)) +#
             geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
             geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -1119,8 +1082,7 @@ server <- shinyServer(function(input, output   ) {
             axis.line = element_line(colour = "black")
           )
           
-          g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
-            #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+          g0 <- g0 + labs(
             caption = "The lines indicate the median, 2.5 and 97.5 percentiles" 
           ) 
           print(g0)
@@ -1160,7 +1122,6 @@ server <- shinyServer(function(input, output   ) {
         
        usercor <- reactive({ 
         
-         # sample <- random.sample()
          sample <- random.sample()
          reps <- sims <- sample$sims
          
@@ -1177,7 +1138,7 @@ server <- shinyServer(function(input, output   ) {
          names(df) <-c("A","B")
          
           z1 <- cor.test(df$A,df$B)
-          xx <- as.integer(as.vector(z1$parameter)+2)
+          xx <- as.integer(as.vector(z1$parameter)+2) 
           z1 <- c( (xx), unlist(z1$estimate), unlist(z1$conf.int)[1:2])
        
          names(z1) <- c("N","Estimate","Lower","Upper")
@@ -1207,7 +1168,6 @@ server <- shinyServer(function(input, output   ) {
             
              data.set <- df
             
-            # library(LaplacesDemon)
             len <- length(data.set$A)
             
             sboot <- function() {
@@ -1226,9 +1186,7 @@ server <- shinyServer(function(input, output   ) {
             BB <- BayesianBootstrap(X=X, n=sims,
                                     Method=function(x,w) cov.wt(x, w, cor=TRUE)$cor[1,2]) 
             
-            # library(bayesboot)
             # Using the weighted correlation (corr) from the boot package.
-            #  library(boot)
             b4 <- bayesboot(data.set, corr, R = sims, use.weights = TRUE)
             
             
@@ -1277,7 +1235,6 @@ server <- shinyServer(function(input, output   ) {
             )
             
             p <- c(-.9, -.99,.99 , -.95, .95, .999, .9999,c(-.8,-.4,0,.5,.8))  
-            #library(scales)
             g0 <- ggplot(data=foo1, aes(x = value)) +#
               geom_vline(data = dummy2, aes(xintercept = q1,  colour="red", linetype = "dotdash")) +
               geom_vline(data = dummy2, aes(xintercept = q50, colour="red", linetype = "dotdash")) +
@@ -1319,8 +1276,7 @@ server <- shinyServer(function(input, output   ) {
               axis.line = element_line(colour = "black")
             )
             
-            g0 <- g0 + labs(#title = "MLB run scoring, 1901-2015",
-              #subtitle = "Run scoring has been falling for 15 years, reversing a 30 year upward trend",
+            g0 <- g0 + labs(
               caption = "The lines indicate the median, 2.5 and 97.5 percentiles" 
             ) 
             print(g0)
@@ -1330,7 +1286,7 @@ server <- shinyServer(function(input, output   ) {
         
         
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # print Ruben's data
+        # print Efron's data
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
        output$tablex <- DT::renderDataTable({
