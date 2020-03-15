@@ -210,7 +210,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               here (the data are printed in the figure footnote [3]).
                                               We use the Fisher's z transformation to plot each distribution. The only user input that has
                                               impact here are the number of Monte Carlo simulations. We present clockwise from top left, 
-                                              an approach in which n paired samples are analysed first by drawing 8 random uniform values 
+                                              an approach in which 9 paired samples are analysed first by drawing 8 random uniform values 
                                               between 0 and 1 and the
                                               9 gap sizes are then the weights used to calculate correlation. The next approach 
                                               is from the LaplaceDemon package, followed by the frequentist bootstrap and lastly
@@ -592,7 +592,7 @@ server <- shinyServer(function(input, output   ) {
       abline(v=q[3], col="red", lty='dashed')
       abline(v=mu1, col="black", lty='dashed')
       
-      captio=("xxxx")
+      #caption=("xxxx")
      
       par(mfrow=c(1,1))
       
