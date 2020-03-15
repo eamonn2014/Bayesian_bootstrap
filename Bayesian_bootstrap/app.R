@@ -159,7 +159,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   
                                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                   tabPanel("1 Estimating a one sample mean", value=7, 
-                                                    h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size, 
+                                                    h4("Using the left inputs we can control the number of Monte Carlo simulations, the sample size, 
                                                     the true population mean and true standard deviation. We present from the left, the familiar 
                                                     nonparametric frequentist bootstrap percentile approach. 
                                                     The middle distribution below, the Bayesian bootstrap, proceeds by drawing n-1 random uniform values between 0 and 1 
