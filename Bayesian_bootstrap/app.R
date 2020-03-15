@@ -56,7 +56,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 functions from R packages [2,3]. Included too is the frequentist nonparametric bootstrap approach. We (i) estimate a mean from 
                 one sample from a normal distribution (tab 1) and 
                 (ii) estimate a correlation coefficient between two groups of samples (other tabs). In the case of estimating a one sample mean, if n is the sample size, the Bayesian bootstrap proceeds
-                by drawing n-1 uniform samples, 
+            by drawing n-1 random uniform samples (between 0 and 1), 
                 the size of the n gaps between the uniform draws
                 are the
                 the weights for the calculation, hence the smoothness* of the Bayesian distribution generally in comparison with the frequentist. 
@@ -84,7 +84,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   br(),  
                                   tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                                   
-                                  h4("The first input below is the number of Monte Carlo simulations which impacts tabs 1,2, 3 and 5. 
+                                  h4("Instructions: The first input below is the number of Monte Carlo simulations which impacts tabs 1,2,3 and 5. 
                                   The next two inputs impact only tab 1, the number of samples and
                                      the true mean and standard deviation. Tab 2 estimates the uncertainty in a correlation 
                                      coefficient and the last two inputs, the number of samples (in each of two groups) and the true correlation between
@@ -162,7 +162,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                     h4("Using the the inputs left we can control the number of Monte Carlo simulations, the sample size, 
                                                     the true population mean and true standard deviation. We present from the left, the familiar 
                                                     nonparametric frequentist bootstrap percentile approach. 
-                                                    With the first Bayesian bootstrap method proceeds by drawing n-1 random uniform values between 0 and 1 
+                                                    The middle distribution below, the Bayesian bootstrap, proceeds by drawing n-1 random uniform values between 0 and 1 
                                                     and the n gap sizes are 
                 the weights for the calculation of a weighted mean, this process is repeated a large number of times, 
                 specified by the number of Monte Carlo simulations.
